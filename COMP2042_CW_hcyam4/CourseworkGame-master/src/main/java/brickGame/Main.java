@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
-
 
     private int level = 0;
 
@@ -48,7 +48,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     private Rectangle rect;
     private int       ballRadius = 10;
-
     private int destroyedBlockCount = 0;
 
     private double v = 1.000;
@@ -60,8 +59,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private long goldTime = 0;
 
     private GameEngine engine;
-    public static String savePath    = "D:/save/save.mdds";
-    public static String savePathDir = "D:/save/";
+    public static String savePath    = "C:/save/save.mdds";
+    public static String savePathDir = "C:/save/";
 
     private ArrayList<Block> blocks = new ArrayList<Block>();
     private ArrayList<Bonus> chocos = new ArrayList<Bonus>();
@@ -91,15 +90,15 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     Button load    = null;
     Button newGame = null;
 
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
 
-
         if (loadFromSave == false) {
             level++;
             if (level >1){
-                new Score().showMessage("Level Up :)", this);
+                new Score().showMessage("Level Up!", this);
             }
             if (level == 18) {
                 new Score().showWin(this);
@@ -110,37 +109,53 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             initBreak();
             initBoard();
 
+            //main menu
             load = new Button("Load Game");
-            newGame = new Button("Start New Game");
+            newGame = new Button("New Game");
             load.setTranslateX(220);
             load.setTranslateY(300);
             newGame.setTranslateX(220);
             newGame.setTranslateY(340);
 
+
         }
 
 
         root = new Pane();
+
+        //setting scene background image
+        //ImageView background = new ImageView(new Image("bg.jpg",sceneWidth , sceneHeigt, false, true));
+        //root.getChildren().add(background);
+
         scoreLabel = new Label("Score: " + score);
         levelLabel = new Label("Level: " + level);
         levelLabel.setTranslateY(20);
         heartLabel = new Label("Heart : " + heart);
         heartLabel.setTranslateX(sceneWidth - 70);
         if (loadFromSave == false) {
-            root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame);
+            root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame, load);
         } else {
             root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel);
         }
         for (Block block : blocks) {
             root.getChildren().add(block.rect);
         }
+        //main menu scene
         Scene scene = new Scene(root, sceneWidth, sceneHeigt);
         scene.getStylesheets().add("style.css");
         scene.setOnKeyPressed(this);
 
-        primaryStage.setTitle("Game");
+        //window icon
+        Image icon = new Image("ballbricks.png");
+        primaryStage.getIcons().add(icon);
+
+        //changed title
+        primaryStage.setTitle("Brick by Brick");
+        //making the window a fixed size
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
+
 
         if (loadFromSave == false) {
             if (level > 1 && level < 18) {
@@ -156,9 +171,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 @Override
                 public void handle(ActionEvent event) {
                     loadGame();
-
                     load.setVisible(false);
                     newGame.setVisible(false);
+
                 }
             });
 
@@ -172,6 +187,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
                     load.setVisible(false);
                     newGame.setVisible(false);
+
                 }
             });
         } else {
@@ -225,7 +241,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 move(LEFT);
                 break;
             case RIGHT:
-
                 move(RIGHT);
                 break;
             case DOWN:
@@ -234,6 +249,10 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             case S:
                 saveGame();
                 break;
+            // when the up button is pressed, shoot the ball, ball will always return to the break (paddle)
+            //when it reaches the bottom of the screen and at the beginning of the game
+            //case UP:
+                //shootBall();
         }
     }
 
@@ -260,7 +279,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        return;
+                        //e.printStackTrace();
                     }
                     if (i >= 20) {
                         sleepTime = i;
@@ -445,7 +465,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private void checkDestroyedCount() {
         if (destroyedBlockCount == blocks.size()) {
             //TODO win level todo...
-            //System.out.println("You Win");
+            System.out.println("You Win");
 
             nextLevel();
         }

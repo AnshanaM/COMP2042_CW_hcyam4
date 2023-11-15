@@ -1,0 +1,186 @@
+@startuml
+class brickGame.BlockSerializable {
++ int row
++ int j
++ int type
++ <<Create>> BlockSerializable(int,int,int)
+}
+class brickGame.GameEngine {
+- OnAction onAction
+- int fps
+- Thread updateThread
+- Thread physicsThread
++ boolean isStopped
+- long time
+- Thread timeThread
++ void setOnAction(OnAction)
++ void setFps(int)
+- void Update()
+- void Initialize()
+- void PhysicsCalculation()
++ void start()
++ void stop()
+- void TimeStart()
+}
+interface brickGame.GameEngine$OnAction {
+~ void onUpdate()
+~ void onInit()
+~ void onPhysicsUpdate()
+~ void onTime(long)
+}
+class brickGame.Main {
+- int level
+- double xBreak
+- double centerBreakX
+- double yBreak
+- int breakWidth
+- int breakHeight
+- int halfBreakWidth
+- int sceneWidth
+- int sceneHeigt
+- {static} int LEFT
+- {static} int RIGHT
+- Circle ball
+- double xBall
+- double yBall
+- boolean isGoldStauts
+- boolean isExistHeartBlock
+- Rectangle rect
+- int ballRadius
+- int destroyedBlockCount
+- double v
+- int heart
+- int score
+- long time
+- long hitTime
+- long goldTime
+- GameEngine engine
++ {static} String savePath
++ {static} String savePathDir
+- ArrayList<Block> blocks
+- ArrayList<Bonus> chocos
+- Color[] colors
++ Pane root
+- Label scoreLabel
+- Label heartLabel
+- Label levelLabel
+- boolean loadFromSave
+~ Stage primaryStage
+~ Button load
+~ Button newGame
+~ float oldXBreak
+- boolean goDownBall
+- boolean goRightBall
+- boolean colideToBreak
+- boolean colideToBreakAndMoveToRight
+- boolean colideToRightWall
+- boolean colideToLeftWall
+- boolean colideToRightBlock
+- boolean colideToBottomBlock
+- boolean colideToLeftBlock
+- boolean colideToTopBlock
+- double vX
+- double vY
++ void start(Stage)
+- void initBoard()
++ {static} void main(String[])
++ void handle(KeyEvent)
+- void move(int)
+- void initBall()
+- void initBreak()
+- void resetColideFlags()
+- void setPhysicsToBall()
+- void checkDestroyedCount()
+- void saveGame()
+- void loadGame()
+- void nextLevel()
++ void restartGame()
++ void onUpdate()
++ void onInit()
++ void onPhysicsUpdate()
++ void onTime(long)
+}
+class brickGame.Block {
+- {static} Block block
++ int row
++ int column
++ boolean isDestroyed
+- Color color
++ int type
++ int x
++ int y
+- int width
+- int height
+- int paddingTop
+- int paddingH
++ Rectangle rect
++ {static} int NO_HIT
++ {static} int HIT_RIGHT
++ {static} int HIT_BOTTOM
++ {static} int HIT_LEFT
++ {static} int HIT_TOP
++ {static} int BLOCK_NORMAL
++ {static} int BLOCK_CHOCO
++ {static} int BLOCK_STAR
++ {static} int BLOCK_HEART
++ <<Create>> Block(int,int,Color,int)
+- void draw()
++ int checkHitToBlock(double,double)
++ {static} int getPaddingTop()
++ {static} int getPaddingH()
++ {static} int getHeight()
++ {static} int getWidth()
+}
+class brickGame.LoadSave {
++ boolean isExistHeartBlock
++ boolean isGoldStauts
++ boolean goDownBall
++ boolean goRightBall
++ boolean colideToBreak
++ boolean colideToBreakAndMoveToRight
++ boolean colideToRightWall
++ boolean colideToLeftWall
++ boolean colideToRightBlock
++ boolean colideToBottomBlock
++ boolean colideToLeftBlock
++ boolean colideToTopBlock
++ int level
++ int score
++ int heart
++ int destroyedBlockCount
++ double xBall
++ double yBall
++ double xBreak
++ double yBreak
++ double centerBreakX
++ long time
++ long goldTime
++ double vX
++ ArrayList<BlockSerializable> blocks
++ void read()
+}
+class brickGame.Score {
++ void show(double,double,int,Main)
++ void showMessage(String,Main)
++ void showGameOver(Main)
++ void showWin(Main)
+}
+class brickGame.Bonus {
++ Rectangle choco
++ double x
++ double y
++ long timeCreated
++ boolean taken
++ <<Create>> Bonus(int,int)
+- void draw()
+}
+
+
+java.io.Serializable <|.. brickGame.BlockSerializable
+brickGame.GameEngine +.. brickGame.GameEngine$OnAction
+javafx.event.EventHandler <|.. brickGame.Main
+brickGame.OnAction <|.. brickGame.Main
+javafx.application.Application <|-- brickGame.Main
+java.io.Serializable <|.. brickGame.Block
+java.io.Serializable <|.. brickGame.Bonus
+@enduml

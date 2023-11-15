@@ -40,7 +40,6 @@ public class LoadSave {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(Main.savePath)));
 
-
             level = inputStream.readInt();
             score = inputStream.readInt();
             heart = inputStream.readInt();
@@ -78,7 +77,8 @@ public class LoadSave {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("no games saved previously");
+            //e.printStackTrace();
         }
 
     }

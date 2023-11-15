@@ -23,8 +23,8 @@ public class Block implements Serializable {
     public int x;
     public int y;
 
-    private int width = 100;
-    private int height = 30;
+    private int width = 85;
+    private int height = 35;
     private int paddingTop = height * 2;
     private int paddingH = 50;
     public Rectangle rect;
@@ -51,6 +51,11 @@ public class Block implements Serializable {
         draw();
     }
 
+    /**
+     * draw() function creates the brick
+     * it assigns the brick image appropriately
+     * based on the type of brick
+     */
     private void draw() {
         x = (column * width) + paddingH;
         y = (row * height) + paddingTop;

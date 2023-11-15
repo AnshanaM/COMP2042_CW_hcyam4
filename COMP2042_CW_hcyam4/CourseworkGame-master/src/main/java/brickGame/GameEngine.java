@@ -29,7 +29,8 @@ public class GameEngine {
                         onAction.onUpdate();
                         Thread.sleep(fps);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        return;
+                        //e.printStackTrace();
                     }
                 }
             }
@@ -50,7 +51,8 @@ public class GameEngine {
                         onAction.onPhysicsUpdate();
                         Thread.sleep(fps);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        return;
+                        //e.printStackTrace();
                     }
                 }
             }
@@ -72,9 +74,9 @@ public class GameEngine {
     public void stop() {
         if (!isStopped) {
             isStopped = true;
-            updateThread.stop();
-            physicsThread.stop();
-            timeThread.stop();
+            updateThread.interrupt();//changed from updateThread.stop()
+            physicsThread.interrupt();//same for this
+            timeThread.interrupt();//same for this too
         }
     }
 
@@ -93,7 +95,8 @@ public class GameEngine {
                         Thread.sleep(1);
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    return;
+                    //e.printStackTrace();
                 }
             }
         });

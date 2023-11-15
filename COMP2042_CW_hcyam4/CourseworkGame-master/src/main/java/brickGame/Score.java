@@ -82,17 +82,17 @@ public class Score {
                 label.setScaleX(2);
                 label.setScaleY(2);
 
-                Button restart = new Button("Restart");
-                restart.setTranslateX(220);
-                restart.setTranslateY(300);
-                restart.setOnAction(new EventHandler<ActionEvent>() {
+                Button mainMenu = new Button("Back to Menu");
+                mainMenu.setTranslateX(220);
+                mainMenu.setTranslateY(300);
+                mainMenu.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
                         main.restartGame();
                     }
                 });
 
-                main.root.getChildren().addAll(label, restart);
+                main.root.getChildren().addAll(label, mainMenu);
 
             }
         });
