@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 public class LoadSave {
-    public boolean          isExistHeartBlock;
+    /*public static boolean          isExistHeartBlock;
     public boolean          isGoldStauts;
     public boolean          goDownBall;
     public boolean          goRightBall;
@@ -30,56 +30,52 @@ public class LoadSave {
     public double           centerBreakX;
     public long             time;
     public long             goldTime;
-    public double           vX;
-    public ArrayList<BlockSerializable> blocks = new ArrayList<BlockSerializable>();
+    public double           vX;*/
+    public ArrayList<BlockSerializable> blocks = new ArrayList<>();
 
-
-    public void read() {
-
-
+    public boolean loadGame() {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(Main.savePath)));
 
-            level = inputStream.readInt();
-            score = inputStream.readInt();
-            heart = inputStream.readInt();
-            destroyedBlockCount = inputStream.readInt();
+            Main.level = inputStream.readInt();
+            Main.score.setScore(inputStream.readInt());
+            Main.heart = inputStream.readInt();
+            Main.destroyedBlockCount = inputStream.readInt();
 
+            Main.xBall = inputStream.readDouble();
+            Main.yBall = inputStream.readDouble();
+            Main.xBreak = inputStream.readDouble();
+            Main.yBreak = inputStream.readDouble();
+            Main.centerBreakX = inputStream.readDouble();
+            Main.time = inputStream.readLong();
+            Main.goldTime = inputStream.readLong();
+            Main.vX = inputStream.readDouble();
 
-            xBall = inputStream.readDouble();
-            yBall = inputStream.readDouble();
-            xBreak = inputStream.readDouble();
-            yBreak = inputStream.readDouble();
-            centerBreakX = inputStream.readDouble();
-            time = inputStream.readLong();
-            goldTime = inputStream.readLong();
-            vX = inputStream.readDouble();
-
-
-            isExistHeartBlock = inputStream.readBoolean();
-            isGoldStauts = inputStream.readBoolean();
-            goDownBall = inputStream.readBoolean();
-            goRightBall = inputStream.readBoolean();
-            colideToBreak = inputStream.readBoolean();
-            colideToBreakAndMoveToRight = inputStream.readBoolean();
-            colideToRightWall = inputStream.readBoolean();
-            colideToLeftWall = inputStream.readBoolean();
-            colideToRightBlock = inputStream.readBoolean();
-            colideToBottomBlock = inputStream.readBoolean();
-            colideToLeftBlock = inputStream.readBoolean();
-            colideToTopBlock = inputStream.readBoolean();
-
-
+            Main.isExistHeartBlock = inputStream.readBoolean();
+            Main.isGoldStauts = inputStream.readBoolean();
+            Main.goDownBall = inputStream.readBoolean();
+            Main.goRightBall = inputStream.readBoolean();
+            Main.colideToBreak = inputStream.readBoolean();
+            Main.colideToBreakAndMoveToRight = inputStream.readBoolean();
+            Main.colideToRightWall = inputStream.readBoolean();
+            Main.colideToLeftWall = inputStream.readBoolean();
+            Main.colideToRightBlock = inputStream.readBoolean();
+            Main.colideToBottomBlock = inputStream.readBoolean();
+            Main.colideToLeftBlock = inputStream.readBoolean();
+            Main.colideToTopBlock = inputStream.readBoolean();
             try {
+                Main.destroyedBlockCount = 0;
                 blocks = (ArrayList<BlockSerializable>) inputStream.readObject();
-            } catch (ClassNotFoundException e) {
+//                Main.blocks.clear();
+//                Main.bonuses.clear();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } catch (IOException e) {
             System.out.println("no games saved previously");
+            return false;
             //e.printStackTrace();
         }
-
+        return true;
     }
 }

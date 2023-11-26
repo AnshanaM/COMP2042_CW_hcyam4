@@ -23,7 +23,7 @@ public class GameEngine {
     private synchronized void Update() {
         updateThread = new Thread(new Runnable() {
             @Override
-            public void run() {
+            public synchronized void run() {
                 while (!updateThread.isInterrupted()) {
                     try {
                         onAction.onUpdate();
@@ -45,7 +45,7 @@ public class GameEngine {
     private synchronized void PhysicsCalculation() {
         physicsThread = new Thread(new Runnable() {
             @Override
-            public void run() {
+            public synchronized void run() {
                 while (!physicsThread.isInterrupted()) {
                     try {
                         onAction.onPhysicsUpdate();

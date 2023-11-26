@@ -1,6 +1,5 @@
 package brickGame;
 
-
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -13,22 +12,18 @@ public class Block implements Serializable {
 
     public int row;
     public int column;
-
-
     public boolean isDestroyed = false;
-
-    private Color color;
+    private final Color color;
     public int type;
 
     public int x;
     public int y;
 
-    private int width = 85;
-    private int height = 35;
-    private int paddingTop = height * 2;
-    private int paddingH = 50;
+    private final int width = 85;
+    private final int height = 35;
+    private final int paddingTop = height * 2;//padding from the top vertically
+    private final int paddingH = 37; //padding from the left side horizontally
     public Rectangle rect;
-
 
     public static int NO_HIT = -1;
     public static int HIT_RIGHT = 0;
@@ -86,27 +81,20 @@ public class Block implements Serializable {
 
 
     public int checkHitToBlock(double xBall, double yBall) {
-
         if (isDestroyed) {
             return NO_HIT;
         }
-
-        if (xBall >= x && xBall <= x + width && yBall == y + height) {
-            return HIT_BOTTOM;
+        if (xBall >= x && xBall <= x + width && yBall >= y && yBall <= y + height) {
+            if (yBall == y + height) {
+                return HIT_BOTTOM;
+            } else if (yBall == y) {
+                return HIT_TOP;
+            } else if (xBall == x + width) {
+                return HIT_RIGHT;
+            } else if (xBall == x) {
+                return HIT_LEFT;
+            }
         }
-
-        if (xBall >= x && xBall <= x + width && yBall == y) {
-            return HIT_TOP;
-        }
-
-        if (yBall >= y && yBall <= y + height && xBall == x + width) {
-            return HIT_RIGHT;
-        }
-
-        if (yBall >= y && yBall <= y + height && xBall == x) {
-            return HIT_LEFT;
-        }
-
         return NO_HIT;
     }
 
@@ -127,3 +115,5 @@ public class Block implements Serializable {
     }
 
 }
+
+

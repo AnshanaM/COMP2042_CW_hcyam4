@@ -1,13 +1,33 @@
-.root {
-    -fx-background-color: #1d1d1d;
-}
-
-.goldRoot {
-    -fx-background-color: #4b4a08;
-}
 
 .label {
+    -fx-font-family: 'VT323';
     -fx-text-fill: #FFF;
     -fx-label-padding: 8px;
-    -fx-font-size: 15px;
+    -fx-font-size: 20px;
+}
+
+.custom-font {
+    -fx-font-family: 'VT323';
+    -fx-font-size: 20px;
+}
+
+.button {
+    -fx-font-size: 25px;
+    -fx-font-family: "VT323";
+    -fx-text-fill: #f5bd45;
+    -fx-background-color: #183c28;
+    -fx-background-radius: 10;
+    -fx-padding: 10px 20px;
+    -fx-border-color: #b37a00;
+    -fx-border-width: 3px;
+    -fx-border-radius: 10;
+}
+.button:hover {
+    -fx-background-color: #10291b;
+    -fx-cursor: pointer;
+}
+.button:active {
+    -fx-top: 2px;
+    -fx-left: 2px;
+    -fx-box-shadow: none;
 }
