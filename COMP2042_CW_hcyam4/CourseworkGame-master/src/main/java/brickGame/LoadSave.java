@@ -1,12 +1,14 @@
 package brickGame;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.ArrayList;
 
+import static brickGame.Main.score;
+import static brickGame.Main.yBreak;
+
 public class LoadSave {
+    private static String savePath    = "./save/save.mdds";
+    private static String savePathDir = "./save";
     /*public static boolean          isExistHeartBlock;
     public boolean          isGoldStauts;
     public boolean          goDownBall;
@@ -35,17 +37,17 @@ public class LoadSave {
 
     public boolean loadGame() {
         try {
-            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(Main.savePath)));
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(savePath)));
 
             Main.level = inputStream.readInt();
-            Main.score.setScore(inputStream.readInt());
+            score.setScore(inputStream.readInt());
             Main.heart = inputStream.readInt();
             Main.destroyedBlockCount = inputStream.readInt();
 
             Main.xBall = inputStream.readDouble();
             Main.yBall = inputStream.readDouble();
             Main.xBreak = inputStream.readDouble();
-            Main.yBreak = inputStream.readDouble();
+            yBreak = inputStream.readDouble();
             Main.centerBreakX = inputStream.readDouble();
             Main.time = inputStream.readLong();
             Main.goldTime = inputStream.readLong();
@@ -77,5 +79,64 @@ public class LoadSave {
             //e.printStackTrace();
         }
         return true;
+    }
+
+    public void saveGame(Main main, ArrayList<BlockSerializable> blockSerializables) {
+        new Thread(() -> {
+            new File(savePathDir).mkdirs();
+            File file = new File(savePath);
+            ObjectOutputStream outputStream = null;
+
+            try {
+                outputStream = new ObjectOutputStream(new FileOutputStream(file));
+
+                outputStream.writeInt(Main.level);
+                outputStream.writeInt(Main.score.getScore());
+                outputStream.writeInt(Main.heart);
+                outputStream.writeInt(Main.destroyedBlockCount);
+
+
+                outputStream.writeDouble(Main.xBall);
+                outputStream.writeDouble(Main.yBall);
+                outputStream.writeDouble(Main.xBreak);
+                outputStream.writeDouble(Main.yBreak);
+                outputStream.writeDouble(Main.centerBreakX);
+                outputStream.writeLong(Main.time);
+                outputStream.writeLong(Main.goldTime);
+                outputStream.writeDouble(Main.vX);
+
+                outputStream.writeBoolean(Main.isExistHeartBlock);
+                outputStream.writeBoolean(Main.isGoldStauts);
+                outputStream.writeBoolean(Main.goDownBall);
+                outputStream.writeBoolean(Main.goRightBall);
+                outputStream.writeBoolean(Main.colideToBreak);
+                outputStream.writeBoolean(Main.colideToBreakAndMoveToRight);
+                outputStream.writeBoolean(Main.colideToRightWall);
+                outputStream.writeBoolean(Main.colideToLeftWall);
+                outputStream.writeBoolean(Main.colideToRightBlock);
+                outputStream.writeBoolean(Main.colideToBottomBlock);
+                outputStream.writeBoolean(Main.colideToLeftBlock);
+                outputStream.writeBoolean(Main.colideToTopBlock);
+
+                outputStream.writeObject(blockSerializables);
+
+                score.showMessage("Game Saved", main);
+
+            } catch (IOException e) {
+                System.out.print("File IO access issue");
+                return;
+                //e.printStackTrace();
+            } finally {
+                try {
+                    assert outputStream != null;
+                    outputStream.flush();
+                    outputStream.close();
+                } catch (IOException e) {
+                    System.out.print("File IO access issue");
+                    //e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 }

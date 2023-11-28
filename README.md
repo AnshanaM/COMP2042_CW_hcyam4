@@ -17,22 +17,42 @@
             Solution: changed identifier name to msg
 7. [Solved] Issue: NullPointerException in LoadSave.saveGame()
             Solution: added assert statement to prevent null pointer from outputStream.flush()
+8. [Solved] Issue: save directory and save path were in local disk C
+            Solution: changed the addressing relative to the program directory
+9. [Solved] Issue: "You Win" is printed twice when no games are saved
+            Solution: return statement added to exit the loadGame function
+10. [Solved] Issue: in GameEngine class, removed the Initialize method which only implemented one function call
+            Solution: directly called the function onAction.OnInit()
+11. [Solved]
 [NotSolved] Issue: meaningless label identifier name in Score.showGameOver()
-               Solution: changed identifier name to gameOverLabel
+            Solution: changed identifier name to gameOverLabel
 [NotSolved] Issue: meaningless label identifier name in Score.showWin()
-               Solution: changed identifier name to winLabel
+                   Solution: changed identifier name to winLabel
 [NotSolved] Issue: IOException when no games saved but load is clicked
-               Solution: {MAKE LABEL FOR THIS TO NOTIFY GAMER}
+                   Solution: {MAKE LABEL FOR THIS TO NOTIFY GAMER}
 [NotSolved] Issue: paddle and ball appear when no games saved but load is clicked
-               Solution: {make paddle and ball visibility to false}
+                   Solution: {make paddle and ball visibility to false}
 [NotSolved] Issue: current game state not saved
-               Solution:
+                   Solution:
+
+## Refactoring
+Because score needs to be protected from unnecessary changes,
+I made score a private attribute of the Score class with getter, setter and modifier functions.
+Put saveGame and loadGame functions inside LoadSave class and called them from Main.
+Also removed the read function fromthe LoadSave class thus reducing number of lines
+made the {LIST THE DIFFERENT VARIABLLES} protected static so that it can be accessed directly
+from other classes and can be manipulated without using temporary variables like in LoadSave class
+renamed choco to bonus, because of changing the graphics to bricks, choco is not meaningful
+
 
 ## Simplification
 1. [Simplified] made direct assignment to identifier colideToBreakAndMoveToRight instead of direct assignment
 2. [Simplified] used lambda expressions for anonymous methods
 3. [UnSimplified] !!!add load and save function to loadsave class!!!
-4. []
+4. [Simplified] by using different coloured brick images, unnecessary lines of code was removed from the Block class
+5. 
+
+CHECK IF INITBALL INITBREAK AND INITBBOARD ARE IN ONINIT FUNCTION
 
 ## Features
 [Implemented] added tutorial button to view instructions on how to play the game
@@ -47,10 +67,14 @@
 [Extended] main menu, and nextlevel or back to menu option is displayed after a level is complete (gameover or player wins)
 
 ## Next steps
-1. fix load save function
+1. fix load save function [DONE]
 2. highscore
 3. css design alignment of all the buttons
 4. main game title in main menu
 5. make all the visible parts to separate scenes
 6. fix nullpointerexception error
 7. fix concurrentexception error
+8. 3 levels of brick breakability
+9. multiple balls? first make ball separate class
+10. make paddle a separate class
+11. paddle wrap around screen penalty

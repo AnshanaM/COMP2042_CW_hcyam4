@@ -8,12 +8,12 @@ import javafx.scene.shape.Rectangle;
 import java.io.Serializable;
 
 public class Block implements Serializable {
-    private static Block block = new Block(-1, -1, Color.TRANSPARENT, 99);
-
+    private static Block block = new Block(-1, -1, "choco.jpg", 99);
+    //choco.jpg is default brick
     public int row;
     public int column;
     public boolean isDestroyed = false;
-    private final Color color;
+    private String color;
     public int type;
 
     public int x;
@@ -37,7 +37,7 @@ public class Block implements Serializable {
     public static int BLOCK_HEART = 102;
 
 
-    public Block(int row, int column, Color color, int type) {
+    public Block(int row, int column, String color, int type) {
         this.row = row;
         this.column = column;
         this.color = color;
@@ -62,20 +62,15 @@ public class Block implements Serializable {
         rect.setY(y);
 
         if (type == BLOCK_CHOCO) {
-            Image image = new Image("choco.jpg");
-            ImagePattern pattern = new ImagePattern(image);
-            rect.setFill(pattern);
+            color="choco.jpg";
         } else if (type == BLOCK_HEART) {
-            Image image = new Image("heart.jpg");
-            ImagePattern pattern = new ImagePattern(image);
-            rect.setFill(pattern);
+            color="heart.jpg";
         } else if (type == BLOCK_STAR) {
-            Image image = new Image("star.jpg");
-            ImagePattern pattern = new ImagePattern(image);
-            rect.setFill(pattern);
-        } else {
-            rect.setFill(color);
+            color="star.jpg";
         }
+        Image image = new Image(color);
+        ImagePattern pattern = new ImagePattern(image);
+        rect.setFill(pattern);
 
     }
 

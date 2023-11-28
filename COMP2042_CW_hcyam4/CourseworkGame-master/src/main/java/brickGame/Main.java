@@ -66,21 +66,19 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static long goldTime = 0;
 
     protected static GameEngine engine;
-    public static String savePath    = "./save/save.mdds";
-    public static String savePathDir = "./save";
-
     protected static ArrayList<Block> blocks = new ArrayList<>();
     protected static ArrayList<Bonus> bonuses = new ArrayList<Bonus>();
-    protected static Color[]          colors = new Color[]{
-            Color.MAGENTA,
-            Color.RED,
-            Color.GOLD,
-            Color.CORAL
+    protected static String[]          colors = new String[]{
+            "green.jpg",
+            "indigo.jpg",
+            "mustard.jpg",
+            "purple.jpg",
+            "teal.jpg"
     };
     public  Pane             root;
     private Label            scoreLabel;
     private Label            heartLabel;
-
+    LoadSave loadSave = new LoadSave();
     private Label heartFreeze;
 
     private boolean loadFromSave = false;
@@ -237,7 +235,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
 
             load.setOnAction(event -> {
-                LoadSave loadSave = new LoadSave();
+
                 if (loadSave.loadGame()){
                     loadFromSave = true;
                     blocks.clear();
@@ -332,7 +330,14 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 //setPhysicsToBall();
                 break;
             case S:
-                saveGame();
+                ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
+                for (Block block : blocks) {
+                    if (block.isDestroyed) {
+                        continue;
+                    }
+                    blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
+                }
+                loadSave.saveGame(this,blockSerializables);
                 break;
             // when the up button is pressed, shoot the ball, ball will always return to the break (paddle)
             //when it reaches the bottom of the screen and at the beginning of the game
@@ -390,7 +395,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         ImagePattern pattern = new ImagePattern(new Image("block.jpg"));
         rect.setFill(pattern);
     }
-
 
     protected static boolean goDownBall                  = true;
     protected static boolean goRightBall                 = true;
@@ -467,6 +471,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
                 double relation = (xBall - centerBreakX) / ((double) breakWidth / 2);
 
+                //this code calculates the horizoantal speed of the ball
+                //depending on the relative position of the ball and the paddle
+                //and which level is currently played
                 if (Math.abs(relation) <= 0.3) {
                     //vX = 0;
                     vX = Math.abs(relation);
@@ -548,74 +555,74 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
-    private void saveGame() {
-        new Thread(() -> {
-            new File(savePathDir).mkdirs();
-            File file = new File(savePath);
-            ObjectOutputStream outputStream = null;
-
-            try {
-                outputStream = new ObjectOutputStream(new FileOutputStream(file));
-
-                outputStream.writeInt(level);
-                outputStream.writeInt(score.getScore());
-                outputStream.writeInt(heart);
-                outputStream.writeInt(destroyedBlockCount);
-
-
-                outputStream.writeDouble(xBall);
-                outputStream.writeDouble(yBall);
-                outputStream.writeDouble(xBreak);
-                outputStream.writeDouble(yBreak);
-                outputStream.writeDouble(centerBreakX);
-                outputStream.writeLong(time);
-                outputStream.writeLong(goldTime);
-                outputStream.writeDouble(vX);
-
-                outputStream.writeBoolean(isExistHeartBlock);
-                outputStream.writeBoolean(isGoldStauts);
-                outputStream.writeBoolean(goDownBall);
-                outputStream.writeBoolean(goRightBall);
-                outputStream.writeBoolean(colideToBreak);
-                outputStream.writeBoolean(colideToBreakAndMoveToRight);
-                outputStream.writeBoolean(colideToRightWall);
-                outputStream.writeBoolean(colideToLeftWall);
-                outputStream.writeBoolean(colideToRightBlock);
-                outputStream.writeBoolean(colideToBottomBlock);
-                outputStream.writeBoolean(colideToLeftBlock);
-                outputStream.writeBoolean(colideToTopBlock);
-
-                ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
-                for (Block block : blocks) {
-                    if (block.isDestroyed) {
-                        continue;
-                    }
-                    blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
-                }
-
-                outputStream.writeObject(blockSerializables);
-
-                new Score().showMessage("Game Saved", Main.this);
-
-
-            } catch (IOException e) {
-                System.out.print("File IO access issue");
-                return;
-                //e.printStackTrace();
-            } finally {
-                try {
-                    assert outputStream != null;
-                    outputStream.flush();
-                    outputStream.close();
-                } catch (IOException e) {
-                    System.out.print("File IO access issue");
-                    return;
-                    //e.printStackTrace();
-                }
-            }
-        }).start();
-
-    }
+//    private void saveGame() {
+//        new Thread(() -> {
+//            new File(savePathDir).mkdirs();
+//            File file = new File(savePath);
+//            ObjectOutputStream outputStream = null;
+//
+//            try {
+//                outputStream = new ObjectOutputStream(new FileOutputStream(file));
+//
+//                outputStream.writeInt(level);
+//                outputStream.writeInt(score.getScore());
+//                outputStream.writeInt(heart);
+//                outputStream.writeInt(destroyedBlockCount);
+//
+//
+//                outputStream.writeDouble(xBall);
+//                outputStream.writeDouble(yBall);
+//                outputStream.writeDouble(xBreak);
+//                outputStream.writeDouble(yBreak);
+//                outputStream.writeDouble(centerBreakX);
+//                outputStream.writeLong(time);
+//                outputStream.writeLong(goldTime);
+//                outputStream.writeDouble(vX);
+//
+//                outputStream.writeBoolean(isExistHeartBlock);
+//                outputStream.writeBoolean(isGoldStauts);
+//                outputStream.writeBoolean(goDownBall);
+//                outputStream.writeBoolean(goRightBall);
+//                outputStream.writeBoolean(colideToBreak);
+//                outputStream.writeBoolean(colideToBreakAndMoveToRight);
+//                outputStream.writeBoolean(colideToRightWall);
+//                outputStream.writeBoolean(colideToLeftWall);
+//                outputStream.writeBoolean(colideToRightBlock);
+//                outputStream.writeBoolean(colideToBottomBlock);
+//                outputStream.writeBoolean(colideToLeftBlock);
+//                outputStream.writeBoolean(colideToTopBlock);
+//
+//                ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
+//                for (Block block : blocks) {
+//                    if (block.isDestroyed) {
+//                        continue;
+//                    }
+//                    blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
+//                }
+//
+//                outputStream.writeObject(blockSerializables);
+//
+//                score.showMessage("Game Saved", Main.this);
+//
+//
+//            } catch (IOException e) {
+//                System.out.print("File IO access issue");
+//                return;
+//                //e.printStackTrace();
+//            } finally {
+//                try {
+//                    assert outputStream != null;
+//                    outputStream.flush();
+//                    outputStream.close();
+//                } catch (IOException e) {
+//                    System.out.print("File IO access issue");
+//                    return;
+//                    //e.printStackTrace();
+//                }
+//            }
+//        }).start();
+//
+//    }
 /*
     private void loadGame() {
 
@@ -809,18 +816,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             isGoldStauts = false;
         }
 
-        for (Bonus choco : bonuses) {
-            if (choco.y > sceneHeigt || choco.taken) {
+        for (Bonus bonus : bonuses) {
+            if (bonus.y > sceneHeigt || bonus.taken) {
                 continue;
             }
-            if (choco.y >= yBreak && choco.y <= yBreak + breakHeight && choco.x >= xBreak && choco.x <= xBreak + breakWidth) {
+            if (bonus.y >= yBreak && bonus.y <= yBreak + breakHeight && bonus.x >= xBreak && bonus.x <= xBreak + breakWidth) {
                 System.out.println("You Got it and +3 score for you");
-                choco.taken = true;
-                choco.choco.setVisible(false);
+                bonus.taken = true;
+                bonus.choco.setVisible(false);
                 score.incScore(3);
-                score.show(choco.x, choco.y, 3, this);
+                score.show(bonus.x, bonus.y, 3, this);
             }
-            choco.y += ((time - choco.timeCreated) / 1000.000) + 1.000;
+            bonus.y += ((time - bonus.timeCreated) / 1000.000) + 1.000;
         }
 
         //System.out.println("time is:" + time + " goldTime is " + goldTime);
