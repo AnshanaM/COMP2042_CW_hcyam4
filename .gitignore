@@ -9,5 +9,6 @@
 *.class
 
 #ignore the generated save file and highscore file
-save/
+/save/
 highScore.txt
+

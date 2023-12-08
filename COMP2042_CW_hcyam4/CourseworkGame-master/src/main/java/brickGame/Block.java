@@ -6,6 +6,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 import java.io.Serializable;
+import java.util.Random;
 
 public class Block implements Serializable {
     private static Block block = new Block(-1, -1, "choco.jpg", 99);
@@ -75,23 +76,25 @@ public class Block implements Serializable {
     }
 
 
-    public int checkHitToBlock(double xBall, double yBall) {
+    public int checkHitToBlock(double xBall, double yBall, int ballRadius) {
         if (isDestroyed) {
             return NO_HIT;
         }
-        if (xBall >= x && xBall <= x + width && yBall >= y && yBall <= y + height) {
-            if (yBall == y + height) {
-                return HIT_BOTTOM;
-            } else if (yBall == y) {
-                return HIT_TOP;
-            } else if (xBall == x + width) {
-                return HIT_RIGHT;
-            } else if (xBall == x) {
-                return HIT_LEFT;
+        double blockCenterX = x + width / 2;
+        double blockCenterY = y + height / 2;
+        double distance = Math.sqrt(Math.pow(xBall - blockCenterX, 2) + Math.pow(yBall - blockCenterY, 2));
+        if (distance <= ballRadius + Math.max(width, height) / 2) {// Collision detected
+            double relativeX = xBall - blockCenterX;
+            double relativeY = yBall - blockCenterY;
+            if (Math.abs(relativeX) > Math.abs(relativeY)) {
+                return relativeX > 0 ? HIT_LEFT : HIT_RIGHT;
+            } else {
+                return relativeY > 0 ? HIT_TOP : HIT_BOTTOM;
             }
         }
         return NO_HIT;
     }
+
 
     public static int getPaddingTop() {
         return block.paddingTop;
@@ -109,6 +112,33 @@ public class Block implements Serializable {
         return block.width;
     }
 
+    public static void initBoard(int level) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < level + 1; j++) {
+                int r = new Random().nextInt(500);
+                //if (r % 5 == 0) {
+                //continue;
+                //}
+                int type;
+                if (r % 10 == 1) {
+                    type = Block.BLOCK_CHOCO;
+                } else if (r % 10 == 2) {
+                    if (!Main.isExistHeartBlock) {
+                        type = Block.BLOCK_HEART;
+                        Main.isExistHeartBlock = true;
+                    } else {
+                        type = Block.BLOCK_NORMAL;
+                    }
+                } else if (r % 10 == 3) {
+                    type = Block.BLOCK_STAR;
+                } else {
+                    type = Block.BLOCK_NORMAL;
+                }
+                Main.blocks.add(new Block(j, i, Main.colors[r % (Main.colors.length)], type));
+                //System.out.println("colors " + r % (colors.length));
+            }
+        }
+    }
 }
 
 

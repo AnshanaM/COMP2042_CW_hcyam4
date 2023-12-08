@@ -1,9 +1,6 @@
 package brickGame;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 //import sun.plugin2.message.Message;
 
@@ -41,19 +38,20 @@ public class Score {
         scoreIncrement.setTranslateY(y);
 
         addLabel(scoreIncrement,main);
-        new Thread(() -> {
-            for (int i = 0; i < 21; i++) {
-                try {
-                    scoreIncrement.setScaleX(i);
-                    scoreIncrement.setScaleY(i);
-                    scoreIncrement.setOpacity((20 - i) / 20.0);
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            removeLabel(scoreIncrement,main);
-        }).start();
+        Animation.playAnimation(scoreIncrement,main.root);
+//        new Thread(() -> {
+//            for (int i = 0; i < 21; i++) {
+//                try {
+//                    scoreIncrement.setScaleX(i);
+//                    scoreIncrement.setScaleY(i);
+//                    scoreIncrement.setOpacity((20 - i) / 20.0);
+//                    Thread.sleep(5);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            removeLabel(scoreIncrement,main);
+//        }).start();
 
     }
 
@@ -63,49 +61,35 @@ public class Score {
         message.setTranslateY(340);
 
         addLabel(message,main);
+        Animation.playAnimation(message,main.root);
 
-        new Thread(() -> {
-            for (int i = 0; i < 21; i++) {
-                try {
-                    message.setScaleX(i);
-                    message.setScaleY(i);
-                    message.setOpacity((20 - i) / 20.0);
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            removeLabel(message,main);
-        }).start();
     }
 
-    public void showGameOver(final Main main) {
-        Platform.runLater(() -> {
-            Label gameOver = new Label("Game Over :(");
-            gameOver.setTranslateX(200);
-            gameOver.setTranslateY(250);
-            gameOver.setScaleX(2);
-            gameOver.setScaleY(2);
+//    public void showGameOver(final Main main) {
+//        Platform.runLater(() -> {
+//            Label gameOver = new Label("Game Over :(");
+//            gameOver.setTranslateX(200);
+//            gameOver.setTranslateY(250);
+//            gameOver.setScaleX(2);
+//            gameOver.setScaleY(2);
+////            backToMenu.setVisible(true);
+////            main.retry.setVisible(true);
+//            main.root.getChildren().addAll(gameOver);
+//
+//        });
+//    }
 
-            main.mainMenu.setVisible(true);
-
-            main.root.getChildren().addAll(gameOver);
-
-        });
-    }
-
-    public void showWin(final Main main) {
-        Platform.runLater(() -> {
-            Label youWin = new Label("You Win :)");
-            youWin.setTranslateX(200);
-            youWin.setTranslateY(250);
-            youWin.setScaleX(2);
-            youWin.setScaleY(2);
-
-            main.mainMenu.setVisible(true);
-
-            main.root.getChildren().add(youWin);
-
-        });
-    }
+//    public void showWin(final Main main) {
+//        Platform.runLater(() -> {
+//            Label youWin = new Label("You Win :)");
+//            youWin.setTranslateX(200);
+//            youWin.setTranslateY(250);
+//            youWin.setScaleX(2);
+//            youWin.setScaleY(2);
+//
+//            main.initMenus.mainMenu.setVisible(true);
+//            main.root.getChildren().add(youWin);
+//
+//        });
+//    }
 }
