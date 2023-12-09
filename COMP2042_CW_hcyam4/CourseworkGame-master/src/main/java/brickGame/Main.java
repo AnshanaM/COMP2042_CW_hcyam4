@@ -1,7 +1,3 @@
-//version 0.0
-//version 1.0
-//version 1.1
-
 package brickGame;
 
 import javafx.application.Application;
@@ -52,7 +48,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private final int       ballRadius = 10;
     protected static int destroyedBlockCount = 0;
 
-    private final double v = 1.000;
+    private final double v = 2.000;
 
     protected static int  heart    = 3;
     public ImageView heartImage = new ImageView("heartImage.jpg");
@@ -93,8 +89,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static boolean colideToLeftBlock           = false;
     protected static boolean colideToTopBlock            = false;
 
-    protected static double vX = 1.000;
-    protected static double vY = 1.000;
+    protected static double vX = 2.000;
+    protected static double vY = 2.000;
 
 //initialising menus
 static MenuPage initMenus = new MenuPage();
@@ -192,7 +188,7 @@ static MenuPage initMenus = new MenuPage();
                     List<Block> loadedBlocks = new ArrayList<>();
                     for (BlockSerializable ser : loadSave.blocks) {
                         int r = new Random().nextInt(200);
-                        loadedBlocks.add(new Block(ser.row, ser.j, colors[r % colors.length], ser.type));
+                        loadedBlocks.add(new Block(ser.row, ser.j, "concrete.jpg", ser.type));
                     }
                     initMenus.updateLevel(level);
                     blocks.addAll(loadedBlocks);
@@ -323,14 +319,15 @@ static MenuPage initMenus = new MenuPage();
     }
 
     private void setPhysicsToBall() {
-        yBall = goDownBall ? yBall+vY : yBall-vY;
-        xBall = goRightBall ? xBall+vX : xBall-vX;
-        if (yBall - ballRadius <= 0) {//ball hits the top of the screen
+        yBall = goDownBall ? yBall + vY : yBall - vY;
+        xBall = goRightBall ? xBall + vX : xBall - vX;
+
+        if (yBall<= 0) {//ball hits the top of the screen
             resetColideFlags();
             goDownBall = true;
-            return;
         }
-        if (yBall+ballRadius >= sceneHeigt) {//ball hits bottom of screen
+
+        if (yBall + ballRadius >= sceneHeigt) {//ball hits bottom of screen
             goDownBall = false;
             if (!isGoldStauts) {
                 heart--;
@@ -341,26 +338,34 @@ static MenuPage initMenus = new MenuPage();
                 }
             }
         }
-        if (yBall >= yBreak - ballRadius && xBall+ballRadius >= xBreak && xBall <= xBreak + breakWidth) {//ball touching the paddle
+
+        if (yBall >= yBreak - ballRadius && yBall <= yBreak + breakHeight + ballRadius &&
+                xBall + ballRadius >= xBreak && xBall - ballRadius <= xBreak + breakWidth) {//ball touching the paddle
             hitTime = time;
             resetColideFlags();
             colideToBreak = true;
             goDownBall = false;
-            //since ball was moving too fast, update it by a small fraction
-            vX*=1.05;
-            colideToBreakAndMoveToRight = xBall - centerBreakX > 0;
+            colideToBreakAndMoveToRight = xBall+(ballRadius) - centerBreakX >= 0;
         }
-        //Wall Colide
-        if (xBall+ballRadius >= sceneWidth) {
+
+        // Wall Collide
+        if (xBall + ballRadius >= sceneWidth) {
             resetColideFlags();
             goRightBall = false;
+            xBall = sceneWidth - ballRadius; // Correct the position to prevent sticking to the wall
         }
-        if (xBall-ballRadius <= 0) {
+
+        if (xBall - ballRadius <= 0) {
             resetColideFlags();
             goRightBall = true;
+            xBall = ballRadius; // Correct the position to prevent sticking to the wall
         }
-        if (colideToBreak) {goRightBall = colideToBreakAndMoveToRight;}
+
+        if (colideToBreak) {
+            goRightBall = colideToBreakAndMoveToRight;
+        }
     }
+
 
     private void checkDestroyedCount() {
         if (destroyedBlockCount == blocks.size()) {
@@ -380,8 +385,8 @@ static MenuPage initMenus = new MenuPage();
             level++;
             initMenus.updateLevel(level);
             score.setScore(0);
-            vX = 1.000;
-            vY = 1.000;
+            vX = 2.000;
+            vY = 2.000;
             destroyedBlockCount = 0;
             resetColideFlags();
             goDownBall = true;
@@ -417,8 +422,8 @@ static MenuPage initMenus = new MenuPage();
                 initMenus.updateLevel(level);
             }
             score.setScore(0);
-            vX = 1.000;
-            vY = 1.000;
+            vX = 2.000;
+            vY = 2.000;
             destroyedBlockCount = 0;
             resetColideFlags();
             goDownBall = true;
@@ -443,7 +448,7 @@ static MenuPage initMenus = new MenuPage();
     @Override
     public void onUpdate() {
         Platform.runLater(() -> {
-            if (!isGoldStauts){
+            if (!isGoldStauts) {
                 MenuPage.heartLabel.setVisible(true);
             }
             MenuPage.scoreLabel.setText("Score: " + score.getScore());
@@ -459,49 +464,60 @@ static MenuPage initMenus = new MenuPage();
             }
         });
 
-        if (yBall-ballRadius >= Block.getPaddingTop() && yBall-ballRadius <= (Block.getHeight() * (level + 1)) + Block.getPaddingTop()) {
-            for (final Block block : blocks) {
+        if (yBall +(ballRadius) >= Block.getPaddingTop() && yBall <= (Block.getHeight() * (level + 2)) + Block.getPaddingTop()) {
+            for (Block block : blocks) {
                 int hitCode = block.checkHitToBlock(xBall, yBall, ballRadius);
                 if (hitCode != Block.NO_HIT) {
-                    score.incScore(1);
-                    score.show(block.x, block.y, 1, this);
-                    block.rect.setVisible(false);
-                    block.isDestroyed = true;
-                    destroyedBlockCount++;
-                    resetColideFlags();
-                    if (block.type == Block.BLOCK_CHOCO) {
-                        final Bonus newBonus = new Bonus(block.row, block.column);
-                        newBonus.timeCreated = time;
-                        Platform.runLater(() -> root.getChildren().add(newBonus.bonus));
-                        bonuses.add(newBonus);
-                    }
-                    if (block.type == Block.BLOCK_STAR) {
-                        goldTime = time;
-                        ball.setFill(new ImagePattern(new Image("goldball.png")));
-                        System.out.println("gold ball");
-                        bgGold.setVisible(true);
-                        isGoldStauts = true;
-                    }
-                    if (block.type == Block.BLOCK_HEART) {
-                        heart++;
-                        System.out.println("\nheart increase");
-                        Animation.playHeartAnimation(heartImage,block.x+(double) (Block.getWidth()) /2,block.y+(double) (Block.getHeight()) /2,root);
+                    if (block.hits > 2) {
+                        score.incScore(1);
+                        score.show(block.x, block.y, 1, this);
+                        // Instead of setting visibility, remove the block from the root
+                        Platform.runLater(() -> root.getChildren().remove(block.rect));
+                        block.isDestroyed = true;
+                        destroyedBlockCount++;
+                        resetColideFlags();
+                        if (block.type == Block.BLOCK_CHOCO) {
+                            final Bonus newBonus = new Bonus(block.row, block.column);
+                            newBonus.timeCreated = time;
+                            Platform.runLater(() -> root.getChildren().add(newBonus.bonus));
+                            bonuses.add(newBonus);
+                        }
+                        if (block.type == Block.BLOCK_STAR) {
+                            goldTime = time;
+                            ball.setFill(new ImagePattern(new Image("goldball.png")));
+                            System.out.println("gold ball");
+                            bgGold.setVisible(true);
+                            isGoldStauts = true;
+                        }
+                        if (block.type == Block.BLOCK_HEART) {
+                            heart++;
+                            System.out.println("heart increase");
+                            Animation.playHeartAnimation(heartImage, block.x + (double) (Block.getWidth()) / 2, block.y + (double) (Block.getHeight()) / 2, root);
+                        }
+                    } else {
+                        block.hits++;
+                        System.out.printf("\nhits: %d", block.hits);
+                        int r = new Random().nextInt(500);
+                        Image image = new Image(colors[r % (colors.length)]);
+                        ImagePattern pattern = new ImagePattern(image);
+                        // Update the block's fill directly
+                        Platform.runLater(() -> block.rect.setFill(pattern));
                     }
                     if (hitCode == Block.HIT_RIGHT) {
-                        goRightBall = true;
+                        goRightBall = false;
                     } else if (hitCode == Block.HIT_BOTTOM) {
-                        goDownBall = true;
-                    } else if (hitCode == Block.HIT_LEFT) {
-                        goRightBall=false;
-                    } else if (hitCode == Block.HIT_TOP) {
                         goDownBall = false;
+                    } else if (hitCode == Block.HIT_LEFT) {
+                        goRightBall = true;
+                    } else if (hitCode == Block.HIT_TOP) {
+                        goDownBall = true;
                     }
                 }
             }
         }
     }
 
-    @Override
+        @Override
     public void onInit() {
 
     }

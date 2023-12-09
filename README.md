@@ -37,6 +37,9 @@
                    Solution:
 
 ## Refactoring
+
+
+## rough updates
 -----
 Because score needs to be protected from unnecessary changes,
 I made score a private attribute of the Score class with getter, setter and modifier functions.
@@ -72,7 +75,7 @@ back to menu hearts dont change and level becomes 1
 fixed load game
 fixed score heart label by using text wrap
 ------
-
+3 level brick breakability works now
 
 
 ## Simplification
@@ -108,7 +111,7 @@ fixed score heart label by using text wrap
 4. main game title in main menu [DONE]
 6. fix nullpointerexception error
 7. fix concurrentexception error [DONE]
-8. 3 levels of brick breakability: make the last row triple hit brick?
+8. 3 levels of brick breakability [DONE]
 10. make paddle a separate class
 11. paddle wrap around screen penalty
 12. when no games were saved previously, display label animation for it [DONE]
@@ -125,4 +128,4 @@ fixed score heart label by using text wrap
 22. animation class, can remove the remove label function and use it in View class
 22. pause button
 23. CHECK IF INITBALL INITBREAK AND INITBBOARD ARE IN ONINIT FUNCTION
-24. wrap all ui components in platform.runlater()
+24. wrap all ui components in platform.runlater() for removing the nullpointer exception if this does not work its ok just mention in readme 

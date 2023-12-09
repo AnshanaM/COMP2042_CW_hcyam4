@@ -16,6 +16,7 @@ public class Block implements Serializable {
     public boolean isDestroyed = false;
     private String color;
     public int type;
+    public int hits;
 
     public int x;
     public int y;
@@ -43,6 +44,7 @@ public class Block implements Serializable {
         this.column = column;
         this.color = color;
         this.type = type;
+        this.hits = 0;
 
         draw();
     }
@@ -96,6 +98,7 @@ public class Block implements Serializable {
     }
 
 
+
     public static int getPaddingTop() {
         return block.paddingTop;
     }
@@ -112,13 +115,13 @@ public class Block implements Serializable {
         return block.width;
     }
 
+    public void setBlockFill(ImagePattern pattern) {
+        rect.setFill(pattern);
+    }
     public static void initBoard(int level) {
         for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < level + 1; j++) {
+            for (int j = 0; j < level + 2; j++) {
                 int r = new Random().nextInt(500);
-                //if (r % 5 == 0) {
-                //continue;
-                //}
                 int type;
                 if (r % 10 == 1) {
                     type = Block.BLOCK_CHOCO;
@@ -134,8 +137,8 @@ public class Block implements Serializable {
                 } else {
                     type = Block.BLOCK_NORMAL;
                 }
-                Main.blocks.add(new Block(j, i, Main.colors[r % (Main.colors.length)], type));
-                //System.out.println("colors " + r % (colors.length));
+                //Main.blocks.add(new Block(j, i, Main.colors[r % (Main.colors.length)], type));
+                Main.blocks.add(new Block(j, i,"concrete.jpg", type));
             }
         }
     }
