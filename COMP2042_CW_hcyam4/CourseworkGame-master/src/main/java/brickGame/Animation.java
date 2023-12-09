@@ -12,18 +12,19 @@ import javafx.util.Duration;
 public class Animation {
 
     public static void playAnimation(Label labelToAnimate, Pane main) {
+        labelToAnimate.setVisible(true);
         labelToAnimate.setScaleX(0);
         labelToAnimate.setScaleY(0);
         labelToAnimate.setOpacity(1.0);
 
         //timeline for the animation
         Timeline timeline = new Timeline();
-        Duration duration = Duration.millis(750); //animation duration in ms
+        Duration duration = Duration.millis(500); //animation duration in ms
 
         //keyframe definitions
-        KeyValue scaleXValue = new KeyValue(labelToAnimate.scaleXProperty(), 15);
-        KeyValue scaleYValue = new KeyValue(labelToAnimate.scaleYProperty(), 15);
-        KeyValue opacityValue = new KeyValue(labelToAnimate.opacityProperty(), 0);
+        KeyValue scaleXValue = new KeyValue(labelToAnimate.scaleXProperty(), 3);
+        KeyValue scaleYValue = new KeyValue(labelToAnimate.scaleYProperty(), 3);
+        KeyValue opacityValue = new KeyValue(labelToAnimate.opacityProperty(), 1);
 
         //adding key frames to timeline
         KeyFrame keyFrame = new KeyFrame(duration, scaleXValue, scaleYValue, opacityValue);
@@ -82,6 +83,6 @@ public class Animation {
     }
     public static void addImage(final ImageView img, Pane main){
         // Remove the img from the scene after the animation
-        main.getChildren().add(img);
+        main.getChildren().remove(img);
     }
 }

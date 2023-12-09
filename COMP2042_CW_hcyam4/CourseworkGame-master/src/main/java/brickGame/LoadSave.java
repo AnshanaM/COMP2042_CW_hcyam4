@@ -9,30 +9,7 @@ import static brickGame.Main.yBreak;
 public class LoadSave {
     private static String savePath    = "./save/save.mdds";
     private static String savePathDir = "./save";
-    /*public static boolean          isExistHeartBlock;
-    public boolean          isGoldStauts;
-    public boolean          goDownBall;
-    public boolean          goRightBall;
-    public boolean          colideToBreak;
-    public boolean          colideToBreakAndMoveToRight;
-    public boolean          colideToRightWall;
-    public boolean          colideToLeftWall;
-    public boolean          colideToRightBlock;
-    public boolean          colideToBottomBlock;
-    public boolean          colideToLeftBlock;
-    public boolean          colideToTopBlock;
-    public int              level;
-    public int              score;
-    public int              heart;
-    public int              destroyedBlockCount;
-    public double           xBall;
-    public double           yBall;
-    public double           xBreak;
-    public double           yBreak;
-    public double           centerBreakX;
-    public long             time;
-    public long             goldTime;
-    public double           vX;*/
+
     public ArrayList<BlockSerializable> blocks = new ArrayList<>();
 
     public boolean loadGame() {

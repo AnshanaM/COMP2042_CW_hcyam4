@@ -39,19 +39,6 @@ public class Score {
 
         addLabel(scoreIncrement,main);
         Animation.playAnimation(scoreIncrement,main.root);
-//        new Thread(() -> {
-//            for (int i = 0; i < 21; i++) {
-//                try {
-//                    scoreIncrement.setScaleX(i);
-//                    scoreIncrement.setScaleY(i);
-//                    scoreIncrement.setOpacity((20 - i) / 20.0);
-//                    Thread.sleep(5);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            removeLabel(scoreIncrement,main);
-//        }).start();
 
     }
 
@@ -64,32 +51,4 @@ public class Score {
         Animation.playAnimation(message,main.root);
 
     }
-
-//    public void showGameOver(final Main main) {
-//        Platform.runLater(() -> {
-//            Label gameOver = new Label("Game Over :(");
-//            gameOver.setTranslateX(200);
-//            gameOver.setTranslateY(250);
-//            gameOver.setScaleX(2);
-//            gameOver.setScaleY(2);
-////            backToMenu.setVisible(true);
-////            main.retry.setVisible(true);
-//            main.root.getChildren().addAll(gameOver);
-//
-//        });
-//    }
-
-//    public void showWin(final Main main) {
-//        Platform.runLater(() -> {
-//            Label youWin = new Label("You Win :)");
-//            youWin.setTranslateX(200);
-//            youWin.setTranslateY(250);
-//            youWin.setScaleX(2);
-//            youWin.setScaleY(2);
-//
-//            main.initMenus.mainMenu.setVisible(true);
-//            main.root.getChildren().add(youWin);
-//
-//        });
-//    }
 }

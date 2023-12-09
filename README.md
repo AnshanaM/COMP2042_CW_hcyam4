@@ -29,8 +29,8 @@
             Solution: changed identifier name to gameOverLabel
 [NotSolved] Issue: meaningless label identifier name in Score.showWin()
                    Solution: changed identifier name to winLabel
-[NotSolved] Issue: IOException when no games saved but load is clicked
-                   Solution: {MAKE LABEL FOR THIS TO NOTIFY GAMER}
+[Solved] Issue: IOException when no games saved but load is clicked
+                   Solution: made label notif
 [NotSolved] Issue: paddle and ball appear when no games saved but load is clicked
                    Solution: {make paddle and ball visibility to false}
 [NotSolved] Issue: current game state not saved
@@ -68,7 +68,10 @@ addition of next level button allows player to choose whether they want to play 
 heart animation
 retry button the level remains same but heart becomes 3
 back to menu hearts dont change and level becomes 1
-
+------
+fixed load game
+fixed score heart label by using text wrap
+------
 
 
 
@@ -100,15 +103,15 @@ back to menu hearts dont change and level becomes 1
 2. highscore
 3. fix the menu which does not show [DONE]
 4. DO PLAY HEART ANIMATION [DONE]
-4. fix the load game, nothing shows up
-3. css design alignment of all the buttons
+4. fix the load game, nothing shows up [DONE]
+3. css design alignment of all the buttons 
 4. main game title in main menu [DONE]
 6. fix nullpointerexception error
-7. fix concurrentexception error
+7. fix concurrentexception error [DONE]
 8. 3 levels of brick breakability: make the last row triple hit brick?
 10. make paddle a separate class
 11. paddle wrap around screen penalty
-12. when no games were saved previously, display label animation for it
+12. when no games were saved previously, display label animation for it [DONE]
 13. clean collision detection! [DONE]
 14. menupage and score can be singleton class
 15. check design patterns and implement it
@@ -117,8 +120,9 @@ back to menu hearts dont change and level becomes 1
 18. delet unecessary files from github [DONE]
 19. tutorial page
 20. levels page? maybe keep track of levels unlocked?
-21. restart game and new game have similar implementations can simplify it
+21. restart game and new game have similar implementations can simplify it [did somthn diff]
 22. make MVC!
 22. animation class, can remove the remove label function and use it in View class
 22. pause button
 23. CHECK IF INITBALL INITBREAK AND INITBBOARD ARE IN ONINIT FUNCTION
+24. wrap all ui components in platform.runlater()

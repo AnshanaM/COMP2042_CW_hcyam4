@@ -54,7 +54,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     private final double v = 1.000;
 
-    protected static int  heart    = 1;
+    protected static int  heart    = 3;
     public ImageView heartImage = new ImageView("heartImage.jpg");
     protected static Score  score    = new Score();
     protected static long time     = 0;
@@ -166,8 +166,10 @@ static MenuPage initMenus = new MenuPage();
             score.showMessage("Level Up!", this);
         }
         if (level > 7) {
-            initMenus.winMenu.setVisible(true);
-            //score.showWin(this);
+            root.getChildren().remove(initMenus.youWin);
+            root.getChildren().add(initMenus.youWin);
+            initMenus.youWin.setVisible(true);
+            //engine.stop();
             return;
         }
         if (!loadFromSave) {
@@ -181,7 +183,7 @@ static MenuPage initMenus = new MenuPage();
             }
 
             initMenus.load.setOnAction(event -> {
-
+                root.getChildren().clear();
                 if (loadSave.loadGame()){
                     loadFromSave = true;
                     blocks.clear();
@@ -192,22 +194,38 @@ static MenuPage initMenus = new MenuPage();
                         int r = new Random().nextInt(200);
                         loadedBlocks.add(new Block(ser.row, ser.j, colors[r % colors.length], ser.type));
                     }
+                    initMenus.updateLevel(level);
                     blocks.addAll(loadedBlocks);
+                    try {
+                        initMenus.mainMenu.setVisible(false);
+                        initMenus.gamePlayStats.setVisible(true);
+                        loadFromSave=true;
+                        start(primaryStage);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 else{
-                    return;
-                }
-                try {
-                    initMenus.mainMenu.setVisible(false);
-                    initMenus.gamePlayStats.setVisible(true);
-                    start(primaryStage);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
+                    try {
+                        initMenus.mainMenu.setVisible(true);
+                        initMenus.gamePlayStats.setVisible(false);
+                        loadFromSave=false;
+                        start(primaryStage);
+                        Label noSaves = new Label("NO GAMES SAVED");
+                        noSaves.setLayoutX(((double) sceneWidth / 2) - (noSaves.getWidth()));
+                        noSaves.setLayoutY((double) sceneHeigt / 2 - (noSaves.getHeight()));
+                        root.getChildren().add(noSaves);
+                        Animation.playAnimation(noSaves, root);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
             initMenus.newGame.setOnAction(event -> {
+                loadFromSave=false;
                 engine = new GameEngine();
                 engine.setOnAction(Main.this);
                 engine.setFps(150);
@@ -236,9 +254,6 @@ static MenuPage initMenus = new MenuPage();
             case RIGHT:
                 movePaddle(RIGHT);
                 break;
-            case DOWN:
-                //setPhysicsToBall();
-                break;
             case S:
                 ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
                 for (Block block : blocks) {
@@ -249,10 +264,7 @@ static MenuPage initMenus = new MenuPage();
                 }
                 loadSave.saveGame(this,blockSerializables);
                 break;
-            // when the up button is pressed, shoot the ball, ball will always return to the break (paddle)
-            //when it reaches the bottom of the screen and at the beginning of the game
-            //case UP:
-                //shootBall();
+
         }
     }
 
@@ -266,11 +278,7 @@ static MenuPage initMenus = new MenuPage();
                 if (xBreak == 0 && direction == LEFT) {
                     return;
                 }
-                if (direction == RIGHT) {
-                    xBreak++;
-                } else {
-                    xBreak--;
-                }
+                xBreak = (direction == RIGHT) ? xBreak+1 : xBreak-1;
                 centerBreakX = xBreak + halfBreakWidth;
                 try {
                     Thread.sleep(sleepTime);
@@ -357,23 +365,20 @@ static MenuPage initMenus = new MenuPage();
     private void checkDestroyedCount() {
         if (destroyedBlockCount == blocks.size()) {
             System.out.println("You Win");
-            initMenus.mainMenu.setVisible(false);
             initMenus.winMenu.setVisible(true);
-            //score.showWin(this);
             engine.stop();
         }
     }
 
     public void nextLevel() {
         try {
-            initMenus.mainMenu.setVisible(true);
-            initMenus.gameOverMenu.setVisible(false);
+            engine.stop();
+            loadFromSave=false;
             initMenus.winMenu.setVisible(false);
-            initMenus.gamePlayStats.setVisible(false);
+            initMenus.gameOverMenu.setVisible(false);
+            initMenus.mainMenu.setVisible(false);
             level++;
-            initMenus.gamePlayStats.getChildren().remove(initMenus.levelLabel);
-            initMenus.levelLabel = new Label("Level: " + level);
-            initMenus.gamePlayStats.getChildren().add(initMenus.levelLabel);
+            initMenus.updateLevel(level);
             score.setScore(0);
             vX = 1.000;
             vY = 1.000;
@@ -399,6 +404,7 @@ static MenuPage initMenus = new MenuPage();
 
     public void gameReset(int isRetry) {
         try {
+            loadFromSave=false;
             initMenus.mainMenu.setVisible(true);
             initMenus.gameOverMenu.setVisible(false);
             initMenus.winMenu.setVisible(false);
@@ -408,7 +414,7 @@ static MenuPage initMenus = new MenuPage();
             }//hearts remain same if player won previous game
             else{
                 level=1;
-                initMenus.levelLabel = new Label("Level: " + level);
+                initMenus.updateLevel(level);
             }
             score.setScore(0);
             vX = 1.000;
