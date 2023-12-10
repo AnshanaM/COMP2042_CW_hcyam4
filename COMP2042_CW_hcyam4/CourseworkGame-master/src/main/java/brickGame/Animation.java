@@ -46,7 +46,7 @@ public class Animation {
         //animation path
         Path path = new Path();
         path.getElements().add(new MoveTo(x, y));
-        path.getElements().add(new LineTo(Main.initMenus.heartLabel.getLayoutX(),Main.initMenus.heartLabel.getLayoutY())); // Adjust the distance
+        path.getElements().add(new LineTo(Main.displayView.heartLabel.getLayoutX(),Main.displayView.heartLabel.getLayoutY())); // Adjust the distance
         //path transition
         PathTransition pathTransition = new PathTransition();
         pathTransition.setNode(imageViewToAnimate);

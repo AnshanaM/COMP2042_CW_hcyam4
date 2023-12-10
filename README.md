@@ -40,6 +40,9 @@
 
 
 ## rough updates
+ball moves from break and will always move upwards, as to be fair to the player compared to when
+the ball would randomly fall in any direction and in any coordinate this is unfair because if it comes randomly
+at the bottom of the screen, the player will lose a life unnecessariy
 -----
 Because score needs to be protected from unnecessary changes,
 I made score a private attribute of the Score class with getter, setter and modifier functions.
@@ -76,6 +79,15 @@ fixed load game
 fixed score heart label by using text wrap
 ------
 3 level brick breakability works now
+------
+made setPhysicstoball shorter by separting the wall and break collisions into 2 other functions and calling them
+made start function shorter by doing the displays in menuPage constructor
+made loadgame.setonaction shorter by making new function called checkLoad for bobs coding conventions because it 
+had more than 5 indents
+added new functoins to displayview class for adding and removing gold status views
+added new function to bonus called checkistaken
+added highscore functionality using file handling
+moved some functions to bonus class, block class when making functions in main class shorter
 
 
 ## Simplification
@@ -105,13 +117,14 @@ fixed score heart label by using text wrap
     it a static method
 2. highscore
 3. fix the menu which does not show [DONE]
-4. DO PLAY HEART ANIMATION [DONE]
+4. DO PLAY HEART ANIMATION 
 4. fix the load game, nothing shows up [DONE]
 3. css design alignment of all the buttons 
 4. main game title in main menu [DONE]
 6. fix nullpointerexception error
 7. fix concurrentexception error [DONE]
 8. 3 levels of brick breakability [DONE]
+9. fix the retry function it works for levels >1 and backtomenu also does not work for levels >1
 10. make paddle a separate class
 11. paddle wrap around screen penalty
 12. when no games were saved previously, display label animation for it [DONE]
@@ -120,6 +133,7 @@ fixed score heart label by using text wrap
 15. check design patterns and implement it
 16. sound effects?
 17. gold time progress bar?
+18. make menupage singleton
 18. delet unecessary files from github [DONE]
 19. tutorial page
 20. levels page? maybe keep track of levels unlocked?

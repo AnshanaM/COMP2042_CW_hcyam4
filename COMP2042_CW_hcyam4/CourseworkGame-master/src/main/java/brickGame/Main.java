@@ -4,59 +4,45 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
 
     protected static int level = 1;
-
     protected static double xBreak = 250.0f;
     protected static double centerBreakX;
     protected static double yBreak = 640.0f;
-
-    private final int breakWidth     = 130;
-    private final int breakHeight    = 30;
+    public static int breakWidth     = 130;
+    public static int breakHeight    = 30;
     private final int halfBreakWidth = breakWidth/2;
-
     public static final int sceneWidth = 500;
     public static final int sceneHeigt = 700;
-
     private static final int LEFT  = 1;
     private static final int RIGHT = 2;
-
-    private Circle ball;
+    public static Circle ball;
     protected static double xBall = xBreak;
     protected static double yBall = yBreak;
-
     protected static boolean isGoldStauts      = false;
     protected static boolean isExistHeartBlock = false;
-
-    private Rectangle rect, bgGold;
-    private final int       ballRadius = 10;
+    public static Rectangle rect;
+    public static Rectangle bgGold;
+    public static int ballRadius = 10;
     protected static int destroyedBlockCount = 0;
-
     private final double v = 2.000;
-
     protected static int  heart    = 3;
-    public ImageView heartImage = new ImageView("heartImage.jpg");
-    protected static Score  score    = new Score();
+    public static ImageView heartImage = new ImageView("heartImage.jpg");
+    protected static Score  score = new Score();;
     protected static long time     = 0;
-    private long hitTime  = 0;
     protected static long goldTime = 0;
-
     protected static GameEngine engine;
     protected static ArrayList<Block> blocks = new ArrayList<>();
     protected static ArrayList<Bonus> bonuses = new ArrayList<Bonus>();
@@ -68,16 +54,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             "teal.jpg"
     };
     public static Pane             root = new Pane();
-
     LoadSave loadSave = new LoadSave();
-
-    private boolean loadFromSave = false;
-
+    private static boolean loadFromSave = false;
+    static ImageView background;
+    static Image icon;
     static Stage  primaryStage;
-
-    //main menu scene
-    Scene scene = new Scene(root, sceneWidth, sceneHeigt);
-
+    static Scene scene = new Scene(root, sceneWidth, sceneHeigt);
     protected static boolean goDownBall                  = false;
     protected static boolean goRightBall                 = true;
     protected static boolean colideToBreak               = false;
@@ -88,147 +70,118 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static boolean colideToBottomBlock         = false;
     protected static boolean colideToLeftBlock           = false;
     protected static boolean colideToTopBlock            = false;
-
     protected static double vX = 2.000;
     protected static double vY = 2.000;
+    public static int retryFlag = 0;
+    public static DisplayView displayView;
 
-//initialising menus
-static MenuPage initMenus = new MenuPage();
 
-    @Override
-    public void start(Stage primaryStage) {
+    private void initStage(Stage primaryStage){
         Main.primaryStage = primaryStage;
-
         scene.getStylesheets().add("style.css");
         scene.setOnKeyPressed(this);
-
         if (!loadFromSave) {
-            //setting goldtime background
-            bgGold = new Rectangle();
-            bgGold.setWidth(sceneWidth);
-            bgGold.setHeight(sceneHeigt);
-            bgGold.setX(0);
-            bgGold.setY(0);
-            ImagePattern pattern = new ImagePattern(new Image("bgGold.jpg"));
-            bgGold.setFill(pattern);
-            bgGold.setVisible(false);
-
-            initBall();
-            initBreak();
             Block.initBoard(level);
-
-            MenuPage.nextLevel.setOnAction(event -> nextLevel());
-            MenuPage.backToMenu.setOnAction(event -> gameReset(0));
-            MenuPage.retry.setOnAction(event -> gameReset(1));
         }
-
-        //setting scene background image
-        ImageView background = new ImageView(new Image("bg.jpg",sceneWidth , sceneHeigt, false, true));
-        root.getChildren().add(background);
-
-        root.getChildren().addAll(bgGold, rect, ball);
-
-        for (Block block : blocks) {
-            root.getChildren().add(block.rect);
-        }
-
-        //window icon
-        Image icon = new Image("ballbricks.png");
+        displayView = new DisplayView();
         primaryStage.getIcons().add(icon);
-
-        try {
-            Font font = Font.loadFont(getClass().getResourceAsStream("/VT323.ttf"), 15);
-            if (font != null) {
-                System.out.println("Font loaded successfully!");
-            } else {
-                System.out.println("Font is null");
+        Platform.runLater(() -> {
+            primaryStage.show();
+            root.getChildren().addAll(background,bgGold, displayView.mainMenu, displayView.gamePlayStats, displayView.gameOverMenu, displayView.winMenu, rect, ball);
+            for (Block block : blocks) {
+                root.getChildren().add(block.rect);
             }
-        } catch (Exception e) {
-            System.out.println("Font loading failed");
+            heartImage.setVisible(true);
+            Animation.addImage(heartImage,root);
+            if (retryFlag == 1){
+                displayView.mainMenu.setVisible(false);
+            }
+
+        });
+    }
+
+    private boolean checkLoad(){
+        if (loadSave.loadGame()){
+            loadFromSave = true;
+            System.out.printf("\nscore loaded: %d\n",score.getScore());
+            //temporary blocks array to prevent concurrent modification of the blocks during runtime
+            List<Block> loadedBlocks = new ArrayList<>();
+            for (BlockSerializable ser : loadSave.blocks) {
+                loadedBlocks.add(new Block(ser.row, ser.j, "concrete.jpg", ser.type));
+            }
+            Platform.runLater(() -> {
+                blocks.clear();
+                bonuses.clear();
+                displayView.updateObjs(level,score.getScore(),heart);
+                blocks.addAll(loadedBlocks);
+                displayView.mainMenu.setVisible(false);
+                displayView.gamePlayStats.setVisible(true);
+            });
+
+            try {
+                start(primaryStage);
+                return true;
+            }
+            catch (Exception e) {
+                System.out.println("issue in loading game to window");
+            }
         }
-
-        //changed title
-        primaryStage.setTitle("Brick by Brick");
-        //making the window a fixed size
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-        root.getChildren().addAll(initMenus.mainMenu,initMenus.gamePlayStats,initMenus.gameOverMenu,initMenus.winMenu);
-        heartImage.setVisible(false);
-        Animation.addImage(heartImage,root);
-
-        if (level >1){
-            score.showMessage("Level Up!", this);
+        return false;
+    }
+    @Override
+    public void start(Stage primaryStage) {
+        initStage(primaryStage);
+        if (level>1){
+            Platform.runLater(() -> {
+                score.showMessage("Level Up!", this);
+            });
         }
         if (level > 7) {
-            root.getChildren().remove(initMenus.youWin);
-            root.getChildren().add(initMenus.youWin);
-            initMenus.youWin.setVisible(true);
-            //engine.stop();
+            Platform.runLater(() -> {
+//                root.getChildren().remove(displayView.youWin);
+//                root.getChildren().add(displayView.youWin);
+                displayView.youWin.setVisible(true);//CHAMPION?
+            });
+            engine.stop();
             return;
         }
         if (!loadFromSave) {
-            if (level > 1 && level < 7) {
-                initMenus.mainMenu.setVisible(false);
-                initMenus.gamePlayStats.setVisible(true);
+            if ((level > 1 && level < 7) || (retryFlag == 1)) {
+                Platform.runLater(() -> {
+                    displayView.mainMenu.setVisible(false);
+                    displayView.gamePlayStats.setVisible(true);
+                });
                 engine = new GameEngine();
                 engine.setOnAction(this);
                 engine.setFps(150);
                 engine.start();
             }
 
-            initMenus.load.setOnAction(event -> {
+            displayView.load.setOnAction(event -> {
                 root.getChildren().clear();
-                if (loadSave.loadGame()){
-                    loadFromSave = true;
-                    blocks.clear();
-                    bonuses.clear();
-                    //temporary blocks array to prevent concurrent modification of the blocks during runtime
-                    List<Block> loadedBlocks = new ArrayList<>();
-                    for (BlockSerializable ser : loadSave.blocks) {
-                        int r = new Random().nextInt(200);
-                        loadedBlocks.add(new Block(ser.row, ser.j, "concrete.jpg", ser.type));
-                    }
-                    initMenus.updateLevel(level);
-                    blocks.addAll(loadedBlocks);
+                if (!checkLoad()){
                     try {
-                        initMenus.mainMenu.setVisible(false);
-                        initMenus.gamePlayStats.setVisible(true);
-                        loadFromSave=true;
-                        start(primaryStage);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                else{
-                    try {
-                        initMenus.mainMenu.setVisible(true);
-                        initMenus.gamePlayStats.setVisible(false);
+                        displayView.mainMenu.setVisible(true);
+                        displayView.gamePlayStats.setVisible(false);
                         loadFromSave=false;
                         start(primaryStage);
-                        Label noSaves = new Label("NO GAMES SAVED");
-                        noSaves.setLayoutX(((double) sceneWidth / 2) - (noSaves.getWidth()));
-                        noSaves.setLayoutY((double) sceneHeigt / 2 - (noSaves.getHeight()));
-                        root.getChildren().add(noSaves);
-                        Animation.playAnimation(noSaves, root);
+                        displayView.noSaves();
                     }
                     catch (Exception e) {
-                        e.printStackTrace();
+                        System.out.println("issue in loading from save");
                     }
                 }
             });
 
-            initMenus.newGame.setOnAction(event -> {
+            displayView.newGame.setOnAction(event -> {
                 loadFromSave=false;
                 engine = new GameEngine();
                 engine.setOnAction(Main.this);
                 engine.setFps(150);
                 engine.start();
 
-                initMenus.mainMenu.setVisible(false);
-                initMenus.gamePlayStats.setVisible(true);
+                displayView.mainMenu.setVisible(false);
+                displayView.gamePlayStats.setVisible(true);
 
             });
         } else {
@@ -260,7 +213,6 @@ static MenuPage initMenus = new MenuPage();
                 }
                 loadSave.saveGame(this,blockSerializables);
                 break;
-
         }
     }
 
@@ -288,26 +240,7 @@ static MenuPage initMenus = new MenuPage();
             }
         }).start();
     }
-
-    private void initBall() {
-        xBall = xBreak + breakWidth/2;
-        yBall = yBreak + breakHeight/4;
-        ball = new Circle();
-        ball.setRadius(ballRadius);
-        ball.setFill(new ImagePattern(new Image("ball.png")));
-    }
-
-    private void initBreak() {
-        rect = new Rectangle();
-        rect.setWidth(breakWidth);
-        rect.setHeight(breakHeight);
-        rect.setX(xBreak);
-        rect.setY(yBreak);
-        ImagePattern pattern = new ImagePattern(new Image("block.jpg"));
-        rect.setFill(pattern);
-    }
-
-    private void resetColideFlags() {
+    public static void resetColideFlags() {
         colideToBreak = false;
         colideToBreakAndMoveToRight = false;
         colideToRightWall = false;
@@ -317,235 +250,202 @@ static MenuPage initMenus = new MenuPage();
         colideToLeftBlock = false;
         colideToTopBlock = false;
     }
-
-    private void setPhysicsToBall() {
-        yBall = goDownBall ? yBall + vY : yBall - vY;
-        xBall = goRightBall ? xBall + vX : xBall - vX;
-
-        if (yBall<= 0) {//ball hits the top of the screen
+    private void checkWallCollisions(){
+        if (yBall<= 0) {//ball hits top wall
             resetColideFlags();
             goDownBall = true;
         }
-
-        if (yBall + ballRadius >= sceneHeigt) {//ball hits bottom of screen
+        if (yBall + ballRadius >= sceneHeigt) {//ball hits bottom wall
             goDownBall = false;
             if (!isGoldStauts) {
                 heart--;
-                score.show((double) sceneWidth / 2, (double) sceneHeigt / 2, -1, this);
-                if (heart == 0) {
-                    initMenus.gameOverMenu.setVisible(true);
+                score.show((double) sceneWidth / 2, (double) sceneHeigt / 2, -1);
+                if (heart < 1) {
+                    Platform.runLater(()->{
+                        displayView.retry.setOnAction(event -> gameReset(1));
+                        displayView.backToMenu.setOnAction(event -> gameReset(0));
+                        displayView.gameOverMenu.getChildren().addAll(displayView.backToMenu,displayView.retry);
+                        displayView.gameOverMenu.setVisible(true);
+                    });
                     engine.stop();
                 }
             }
         }
-
+        if (xBall + ballRadius >= sceneWidth) {//ball hits right wall
+            resetColideFlags();
+            goRightBall = false;
+            xBall = sceneWidth - ballRadius;
+        }
+        if (xBall - ballRadius <= 0) {
+            resetColideFlags();
+            goRightBall = true;
+            xBall = ballRadius;
+        }
+    }
+    private void checkBreakCollisions(){
         if (yBall >= yBreak - ballRadius && yBall <= yBreak + breakHeight + ballRadius &&
-                xBall + ballRadius >= xBreak && xBall - ballRadius <= xBreak + breakWidth) {//ball touching the paddle
-            hitTime = time;
+                xBall + ballRadius >= xBreak && xBall - ballRadius <= xBreak + breakWidth) {
             resetColideFlags();
             colideToBreak = true;
             goDownBall = false;
             colideToBreakAndMoveToRight = xBall+(ballRadius) - centerBreakX >= 0;
         }
-
-        // Wall Collide
-        if (xBall + ballRadius >= sceneWidth) {
-            resetColideFlags();
-            goRightBall = false;
-            xBall = sceneWidth - ballRadius; // Correct the position to prevent sticking to the wall
-        }
-
-        if (xBall - ballRadius <= 0) {
-            resetColideFlags();
-            goRightBall = true;
-            xBall = ballRadius; // Correct the position to prevent sticking to the wall
-        }
-
         if (colideToBreak) {
             goRightBall = colideToBreakAndMoveToRight;
         }
     }
-
-
+    private void setPhysicsToBall() {
+        yBall = goDownBall ? yBall + vY : yBall - vY;
+        xBall = goRightBall ? xBall + vX : xBall - vX;
+        checkWallCollisions();
+        checkBreakCollisions();
+    }
     private void checkDestroyedCount() {
         if (destroyedBlockCount == blocks.size()) {
             System.out.println("You Win");
-            initMenus.winMenu.setVisible(true);
+            if (score.checkHighScore(score.getScore())){
+                System.out.println("\nnew highscore!");
+                Platform.runLater(()->{
+                    displayView.highScoreMenu();
+                    displayView.nextLevel.setOnAction(event -> nextLevel());
+                    displayView.backToMenu.setOnAction(event -> gameReset(0));
+                });
+                engine.start();
+            }
+            else{
+                Platform.runLater(()->{
+                    displayView.winMenu.setVisible(true);
+                    displayView.nextLevel.setOnAction(event -> nextLevel());
+                    displayView.backToMenu.setOnAction(event -> gameReset(0));
+                });
+//                engine.start();
+            }
             engine.stop();
         }
     }
-
+    private void nextResetCommonSetup(int isRetry) {
+        loadFromSave = false;
+        displayView.winMenu.setVisible(false);
+        displayView.gameOverMenu.setVisible(false);
+        displayView.mainMenu.setVisible(false);
+        vX = 2.000;
+        vY = 2.000;
+        destroyedBlockCount = 0;
+        resetColideFlags();
+        goDownBall = true;
+        isGoldStauts = false;
+        isExistHeartBlock = false;
+        time = 0;
+        goldTime = 0;
+        blocks.clear();
+        bonuses.clear();
+        root.getChildren().clear();
+        if (isRetry == 0){//if going back to menu
+            level = 1;
+            retryFlag = 0;
+        }else{//if retry current level, or go to next level, no changes made to level
+            retryFlag = 1;
+        }
+        heart = 3;
+        start(primaryStage);
+    }
     public void nextLevel() {
         try {
-            engine.stop();
-            loadFromSave=false;
-            initMenus.winMenu.setVisible(false);
-            initMenus.gameOverMenu.setVisible(false);
-            initMenus.mainMenu.setVisible(false);
             level++;
-            initMenus.updateLevel(level);
-            score.setScore(0);
-            vX = 2.000;
-            vY = 2.000;
-            destroyedBlockCount = 0;
-            resetColideFlags();
-            goDownBall = true;
-
-            isGoldStauts = false;
-            isExistHeartBlock = false;
-            hitTime = 0;
-            time = 0;
-            goldTime = 0;
-
-            blocks.clear();
-            bonuses.clear();
-            root.getChildren().clear();
-
-            start(primaryStage);
+            nextResetCommonSetup(-1);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Issue in loading the next level");
         }
     }
-
     public void gameReset(int isRetry) {
         try {
-            loadFromSave=false;
-            initMenus.mainMenu.setVisible(true);
-            initMenus.gameOverMenu.setVisible(false);
-            initMenus.winMenu.setVisible(false);
-            initMenus.gamePlayStats.setVisible(false);
-            if (isRetry == 1) {//if retry button clicked
-                heart = 3;//give hearts but level remains unchanged
-            }//hearts remain same if player won previous game
-            else{
-                level=1;
-                initMenus.updateLevel(level);
-            }
+            engine.stop();
+            nextResetCommonSetup(isRetry);
             score.setScore(0);
-            vX = 2.000;
-            vY = 2.000;
-            destroyedBlockCount = 0;
-            resetColideFlags();
-            goDownBall = true;
-
-            isGoldStauts = false;
-            isExistHeartBlock = false;
-            hitTime = 0;
-            time = 0;
-            goldTime = 0;
-
-            blocks.clear();
-            bonuses.clear();
-            root.getChildren().clear();
-
-            start(primaryStage);
+            displayView.mainMenu.setVisible(true);
+            displayView.gamePlayStats.setVisible(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Issue in going back to the menu");
         }
     }
 
-
-    @Override
-    public void onUpdate() {
+    public void updateGamePlayObjs(){
         Platform.runLater(() -> {
-            if (!isGoldStauts) {
-                MenuPage.heartLabel.setVisible(true);
-            }
-            MenuPage.scoreLabel.setText("Score: " + score.getScore());
-            MenuPage.heartLabel.setText("Heart: " + heart);
-
+            DisplayView.updateObjs(level,score.getScore(),heart);
             rect.setX(xBreak);
             rect.setY(yBreak);
             ball.setCenterX(xBall);
             ball.setCenterY(yBall);
-
             for (Bonus bonusObj : bonuses) {
                 bonusObj.bonus.setY(bonusObj.y);
             }
         });
+    }
 
-        if (yBall +(ballRadius) >= Block.getPaddingTop() && yBall <= (Block.getHeight() * (level + 2)) + Block.getPaddingTop()) {
+    public void updateBallDirection(int hitCode){
+        if (hitCode == Block.HIT_RIGHT) {
+            goRightBall = false;
+        } else if (hitCode == Block.HIT_BOTTOM) {
+            goDownBall = false;
+        } else if (hitCode == Block.HIT_LEFT) {
+            goRightBall = true;
+        } else if (hitCode == Block.HIT_TOP) {
+            goDownBall = true;
+        }
+    }
+
+    @Override
+    public void onUpdate() {
+        if (isGoldStauts){
+            //put animation for chain lock on the heart label in displayview
+        }
+        updateGamePlayObjs();
+        if (isBallCollidingWithBlocks()) {
             for (Block block : blocks) {
                 int hitCode = block.checkHitToBlock(xBall, yBall, ballRadius);
                 if (hitCode != Block.NO_HIT) {
-                    if (block.hits > 2) {
-                        score.incScore(1);
-                        score.show(block.x, block.y, 1, this);
-                        // Instead of setting visibility, remove the block from the root
-                        Platform.runLater(() -> root.getChildren().remove(block.rect));
-                        block.isDestroyed = true;
-                        destroyedBlockCount++;
-                        resetColideFlags();
-                        if (block.type == Block.BLOCK_CHOCO) {
-                            final Bonus newBonus = new Bonus(block.row, block.column);
-                            newBonus.timeCreated = time;
-                            Platform.runLater(() -> root.getChildren().add(newBonus.bonus));
-                            bonuses.add(newBonus);
-                        }
-                        if (block.type == Block.BLOCK_STAR) {
-                            goldTime = time;
-                            ball.setFill(new ImagePattern(new Image("goldball.png")));
-                            System.out.println("gold ball");
-                            bgGold.setVisible(true);
-                            isGoldStauts = true;
-                        }
-                        if (block.type == Block.BLOCK_HEART) {
-                            heart++;
-                            System.out.println("heart increase");
-                            Animation.playHeartAnimation(heartImage, block.x + (double) (Block.getWidth()) / 2, block.y + (double) (Block.getHeight()) / 2, root);
-                        }
-                    } else {
-                        block.hits++;
-                        System.out.printf("\nhits: %d", block.hits);
-                        int r = new Random().nextInt(500);
-                        Image image = new Image(colors[r % (colors.length)]);
-                        ImagePattern pattern = new ImagePattern(image);
-                        // Update the block's fill directly
-                        Platform.runLater(() -> block.rect.setFill(pattern));
-                    }
-                    if (hitCode == Block.HIT_RIGHT) {
-                        goRightBall = false;
-                    } else if (hitCode == Block.HIT_BOTTOM) {
-                        goDownBall = false;
-                    } else if (hitCode == Block.HIT_LEFT) {
-                        goRightBall = true;
-                    } else if (hitCode == Block.HIT_TOP) {
-                        goDownBall = true;
-                    }
+                    handleBlockHit(block, hitCode);
                 }
             }
         }
     }
-
-        @Override
+    private boolean isBallCollidingWithBlocks() {
+        return yBall + ballRadius >= Block.getPaddingTop()
+                && yBall <= (Block.getHeight() * (level + 2)) + Block.getPaddingTop();
+    }
+    private void handleBlockHit(Block block, int hitCode) {
+        if (block.hits >= 3) {
+            score.incScore(1);
+            score.show(block.x, block.y, 1);
+            block.blockIsHit();
+            block.isDestroyed = true;
+            Platform.runLater(() -> {
+                        block.rect.setVisible(false);
+                        root.getChildren().remove(block.rect);
+            });
+            destroyedBlockCount++;
+            resetColideFlags();
+        } else {
+            block.hits++;
+            System.out.printf("\nhits: %d", block.hits);
+            Platform.runLater(block::setBlockFill);
+        }
+        updateBallDirection(hitCode);
+    }
+    @Override
     public void onInit() {
-
     }
 
     @Override
     public void onPhysicsUpdate() {
         checkDestroyedCount();
         setPhysicsToBall();
-
         if (time - goldTime > 5000) {
-            //remove bgGold
-            bgGold.setVisible(false);
-            ball.setFill(new ImagePattern(new Image("ball.png")));
-            root.getStyleClass().remove("goldRoot");
+            displayView.removeGold();
             isGoldStauts = false;
         }
-
         for (Bonus bonusObj : bonuses) {
-            if (bonusObj.y > sceneHeigt || bonusObj.taken) {
-                continue;
-            }
-            if (bonusObj.y >= yBreak && bonusObj.y <= yBreak + breakHeight && bonusObj.x >= xBreak && bonusObj.x <= xBreak + breakWidth) {
-                System.out.println("You Got it and +3 score for you");
-                bonusObj.taken = true;
-                bonusObj.bonus.setVisible(false);
-                score.incScore(3);
-                score.show(bonusObj.x, bonusObj.y, 3, this);
-            }
+            bonusObj.checkIsTaken();
             bonusObj.y += ((time - bonusObj.timeCreated) / 1000.000) + 1.000;
         }
 

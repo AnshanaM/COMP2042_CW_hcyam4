@@ -17,7 +17,7 @@ public class LoadSave {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(savePath)));
 
             Main.level = inputStream.readInt();
-            score.setScore(inputStream.readInt());
+            Main.score.setScore(inputStream.readInt());
             Main.heart = inputStream.readInt();
             Main.destroyedBlockCount = inputStream.readInt();
 
@@ -45,8 +45,6 @@ public class LoadSave {
             try {
                 Main.destroyedBlockCount = 0;
                 blocks = (ArrayList<BlockSerializable>) inputStream.readObject();
-//                Main.blocks.clear();
-//                Main.bonuses.clear();
             } catch (Exception e) {
                 e.printStackTrace();
             }

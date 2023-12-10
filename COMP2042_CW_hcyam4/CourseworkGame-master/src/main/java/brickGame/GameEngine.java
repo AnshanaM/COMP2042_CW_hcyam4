@@ -1,6 +1,8 @@
 package brickGame;
 
 
+import java.io.IOException;
+
 public class GameEngine {
 
     private OnAction onAction;
@@ -53,13 +55,13 @@ public class GameEngine {
                     } catch (InterruptedException e) {
                         return;
                         //e.printStackTrace();
+                    } catch (IOException e) {
+                        return;
                     }
                 }
             }
         });
-
         physicsThread.start();
-
     }
 
     public void start() {
@@ -109,7 +111,7 @@ public class GameEngine {
 
         void onInit();
 
-        void onPhysicsUpdate();
+        void onPhysicsUpdate() throws IOException;
 
         void onTime(long time);
     }

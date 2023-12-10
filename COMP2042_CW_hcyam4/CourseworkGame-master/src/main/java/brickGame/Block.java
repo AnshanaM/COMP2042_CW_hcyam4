@@ -1,5 +1,6 @@
 package brickGame;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -17,10 +18,8 @@ public class Block implements Serializable {
     private String color;
     public int type;
     public int hits;
-
     public int x;
     public int y;
-
     private final int width = 85;
     private final int height = 35;
     private final int paddingTop = height * 2;//padding from the top vertically
@@ -76,8 +75,6 @@ public class Block implements Serializable {
         rect.setFill(pattern);
 
     }
-
-
     public int checkHitToBlock(double xBall, double yBall, int ballRadius) {
         if (isDestroyed) {
             return NO_HIT;
@@ -96,9 +93,6 @@ public class Block implements Serializable {
         }
         return NO_HIT;
     }
-
-
-
     public static int getPaddingTop() {
         return block.paddingTop;
     }
@@ -115,31 +109,59 @@ public class Block implements Serializable {
         return block.width;
     }
 
-    public void setBlockFill(ImagePattern pattern) {
+    public void setBlockFill() {
+        int r = new Random().nextInt(500);
+        Image image = new Image(Main.colors[r % (Main.colors.length)]);
+        ImagePattern pattern = new ImagePattern(image);
         rect.setFill(pattern);
     }
     public static void initBoard(int level) {
         for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < level + 2; j++) {
+            for (int j = 0; j < level+2; j++) {
                 int r = new Random().nextInt(500);
                 int type;
                 if (r % 10 == 1) {
                     type = Block.BLOCK_CHOCO;
+                    System.out.println("\nblock choco");
                 } else if (r % 10 == 2) {
                     if (!Main.isExistHeartBlock) {
                         type = Block.BLOCK_HEART;
                         Main.isExistHeartBlock = true;
+                        System.out.println("\nblock heart");
                     } else {
                         type = Block.BLOCK_NORMAL;
+                        System.out.println("\nblock norm");
                     }
                 } else if (r % 10 == 3) {
                     type = Block.BLOCK_STAR;
+                    System.out.println("\nblockstar");
                 } else {
                     type = Block.BLOCK_NORMAL;
                 }
-                //Main.blocks.add(new Block(j, i, Main.colors[r % (Main.colors.length)], type));
                 Main.blocks.add(new Block(j, i,"concrete.jpg", type));
             }
+        }
+    }
+    public void blockIsHit(){
+        if (this.type == Block.BLOCK_CHOCO) {
+            final Bonus newBonus = new Bonus(this.row, this.column);
+            newBonus.timeCreated = Main.time;
+            Platform.runLater(() -> Main.root.getChildren().add(newBonus.bonus));
+            Main.bonuses.add(newBonus);
+            System.out.println("\nchoco");
+        }
+        if (this.type == Block.BLOCK_STAR) {
+            Main.goldTime = Main.time;
+            System.out.println("gold ball");
+            Main.displayView.setGold();
+            Main.isGoldStauts = true;
+            System.out.println("\ngold bonus");
+        }
+        if (this.type == Block.BLOCK_HEART) {
+            Main.heart++;
+            System.out.println("heart increase");
+            Animation.playHeartAnimation(Main.heartImage, this.x + (double) (Block.getWidth()) / 2, this.y + (double) (Block.getHeight()) / 2, Main.root);
+            System.out.println("\nheart");
         }
     }
 }
