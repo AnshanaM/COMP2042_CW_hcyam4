@@ -1,5 +1,6 @@
 package brickGame;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
@@ -67,6 +68,8 @@ public class Bonus implements Serializable {
                 this.taken = true;
                 this.bonus.setVisible(false);
                 Main.swap = true;
+                Platform.runLater(() -> Main.displayView.displayPortals());
+
             }
 
         }
