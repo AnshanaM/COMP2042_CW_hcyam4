@@ -2,7 +2,7 @@ package brickGame;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -37,14 +37,12 @@ public class Block implements Serializable {
     public static int BLOCK_STAR = 101;
     public static int BLOCK_HEART = 102;
 
-
     public Block(int row, int column, String color, int type) {
         this.row = row;
         this.column = column;
         this.color = color;
         this.type = type;
         this.hits = 0;
-
         draw();
     }
 
@@ -135,7 +133,8 @@ public class Block implements Serializable {
                 } else if (r % 10 == 3) {
                     type = Block.BLOCK_STAR;
                     System.out.println("\nblockstar");
-                } else {
+                }
+                else{
                     type = Block.BLOCK_NORMAL;
                 }
                 Main.blocks.add(new Block(j, i,"concrete.jpg", type));
@@ -148,7 +147,7 @@ public class Block implements Serializable {
             newBonus.timeCreated = Main.time;
             Platform.runLater(() -> Main.root.getChildren().add(newBonus.bonus));
             Main.bonuses.add(newBonus);
-            System.out.println("\nchoco");
+            System.out.printf("\nchoco type: %d",newBonus.type);
         }
         if (this.type == Block.BLOCK_STAR) {
             Main.goldTime = Main.time;
@@ -160,7 +159,7 @@ public class Block implements Serializable {
         if (this.type == Block.BLOCK_HEART) {
             Main.heart++;
             System.out.println("heart increase");
-            Animation.playHeartAnimation(Main.heartImage, this.x + (double) (Block.getWidth()) / 2, this.y + (double) (Block.getHeight()) / 2, Main.root);
+            SpecialEffects.playHeartAnimation(this.x + (double) (Block.getWidth()) / 2, this.y + (double) (Block.getHeight()) / 2);
             System.out.println("\nheart");
         }
     }

@@ -4,8 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 //import sun.plugin2.message.Message;
 
 public class Score {
@@ -83,7 +81,7 @@ public class Score {
         scoreIncrement.setTranslateX(x);
         scoreIncrement.setTranslateY(y);
         addLabel(scoreIncrement);
-        Animation.playAnimation(scoreIncrement,Main.root);
+        SpecialEffects.playLabelAnimation(scoreIncrement,Main.root);
 
     }
 
@@ -93,7 +91,7 @@ public class Score {
         message.setTranslateY(340);
 
         addLabel(message);
-        Animation.playAnimation(message,main.root);
+        SpecialEffects.playLabelAnimation(message,main.root);
 
     }
 }

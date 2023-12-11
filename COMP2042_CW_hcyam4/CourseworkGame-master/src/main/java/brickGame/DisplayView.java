@@ -21,7 +21,7 @@ public class DisplayView {
         gamePlayScreenInit();
         gameOverMenuInit();
         winMenuInit();
-        Main.background = new ImageView(new Image("bg.jpg",Main.sceneWidth , Main.sceneHeigt, false, true));
+        Main.background = new ImageView(new Image("bg.jpg",Main.sceneWidth , Main.sceneHeight, false, true));
         Main.icon = new Image("ballbricks.png");
         initBgGold();
         setFont();
@@ -113,7 +113,7 @@ public class DisplayView {
         //setting goldtime background
         Main.bgGold = new Rectangle();
         Main.bgGold.setWidth(Main.sceneWidth);
-        Main.bgGold.setHeight(Main.sceneHeigt);
+        Main.bgGold.setHeight(Main.sceneHeight);
         Main.bgGold.setX(0);
         Main.bgGold.setY(0);
         ImagePattern pattern = new ImagePattern(new Image("bgGold.jpg"));
@@ -123,9 +123,9 @@ public class DisplayView {
     public void noSaves(){
         Label noSaves = new Label("NO GAMES SAVED");
         noSaves.setLayoutX(((double) Main.sceneWidth / 2) - (noSaves.getWidth()));
-        noSaves.setLayoutY((double) Main.sceneHeigt / 2 - (noSaves.getHeight()));
+        noSaves.setLayoutY((double) Main.sceneHeight / 2 - (noSaves.getHeight()));
         Main.root.getChildren().add(noSaves);
-        Animation.playAnimation(noSaves, Main.root);
+        SpecialEffects.playLabelAnimation(noSaves, Main.root);
     }
     public void removeGold(){
         Main.bgGold.setVisible(false);

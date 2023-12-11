@@ -88,6 +88,10 @@ added new functoins to displayview class for adding and removing gold status vie
 added new function to bonus called checkistaken
 added highscore functionality using file handling
 moved some functions to bonus class, block class when making functions in main class shorter
+------
+added exit game using ESCAPE key
+added pause resume button using the P key
+applied new penalty in bonus class, it makes the break wrap around the screen added to loadSave
 
 
 ## Simplification
@@ -113,33 +117,27 @@ moved some functions to bonus class, block class when making functions in main c
 
 ## Next steps
 1. fix load save function [DONE]
-2. for refactoring, identify which methods are not used in the instance but is called in a class's method can make
-    it a static method
-2. highscore
+2. highscore [DONE]
 3. fix the menu which does not show [DONE]
-4. DO PLAY HEART ANIMATION 
+4. DO PLAY HEART ANIMATION [DONE]
 4. fix the load game, nothing shows up [DONE]
-3. css design alignment of all the buttons 
+3. css design alignment of all the buttons [DONE]
 4. main game title in main menu [DONE]
-6. fix nullpointerexception error
+6. fix nullpointerexception error [!!!!!!!!!!!]
 7. fix concurrentexception error [DONE]
 8. 3 levels of brick breakability [DONE]
-9. fix the retry function it works for levels >1 and backtomenu also does not work for levels >1
-10. make paddle a separate class
-11. paddle wrap around screen penalty
+9. fix the retry function it works for levels >1 and backtomenu also does not work for levels >1[DONE]
+11. paddle wrap around screen penalty [DONE]
 12. when no games were saved previously, display label animation for it [DONE]
 13. clean collision detection! [DONE]
 14. menupage and score can be singleton class
 15. check design patterns and implement it
 16. sound effects?
 17. gold time progress bar?
-18. make menupage singleton
+18. make DISPLAYVIEW singleton
 18. delet unecessary files from github [DONE]
 19. tutorial page
-20. levels page? maybe keep track of levels unlocked?
-21. restart game and new game have similar implementations can simplify it [did somthn diff]
+21. restart game and new game have similar implementations can simplify it [DONE]
 22. make MVC!
-22. animation class, can remove the remove label function and use it in View class
-22. pause button
-23. CHECK IF INITBALL INITBREAK AND INITBBOARD ARE IN ONINIT FUNCTION
+22. pause and exit button [DONE]
 24. wrap all ui components in platform.runlater() for removing the nullpointer exception if this does not work its ok just mention in readme 

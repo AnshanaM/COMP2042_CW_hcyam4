@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
 
@@ -25,7 +26,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public static int breakHeight    = 30;
     private final int halfBreakWidth = breakWidth/2;
     public static final int sceneWidth = 500;
-    public static final int sceneHeigt = 700;
+    public static final int sceneHeight = 700;
     private static final int LEFT  = 1;
     private static final int RIGHT = 2;
     public static Circle ball;
@@ -39,7 +40,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static int destroyedBlockCount = 0;
     private final double v = 2.000;
     protected static int  heart    = 3;
-    public static ImageView heartImage = new ImageView("heartImage.jpg");
     protected static Score  score = new Score();;
     protected static long time     = 0;
     protected static long goldTime = 0;
@@ -59,7 +59,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     static ImageView background;
     static Image icon;
     static Stage  primaryStage;
-    static Scene scene = new Scene(root, sceneWidth, sceneHeigt);
+    static Scene scene = new Scene(root, sceneWidth, sceneHeight);
     protected static boolean goDownBall                  = false;
     protected static boolean goRightBall                 = true;
     protected static boolean colideToBreak               = false;
@@ -74,6 +74,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static double vY = 2.000;
     public static int retryFlag = 0;
     public static DisplayView displayView;
+    private static boolean isPaused = false;
+    public static boolean swap = false;
 
 
     private void initStage(Stage primaryStage){
@@ -91,8 +93,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             for (Block block : blocks) {
                 root.getChildren().add(block.rect);
             }
-            heartImage.setVisible(true);
-            Animation.addImage(heartImage,root);
             if (retryFlag == 1){
                 displayView.mainMenu.setVisible(false);
             }
@@ -194,6 +194,15 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
+    private void handleExit(){
+        try {
+            engine.stop();
+            Stage stage = (Stage)primaryStage.getScene().getWindow();
+            stage.close();
+        } catch (Exception e) {
+            System.out.println("Issue in handling exit");
+        }
+    }
     @Override
     public void handle(KeyEvent event) {
         switch (event.getCode()) {
@@ -213,6 +222,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 }
                 loadSave.saveGame(this,blockSerializables);
                 break;
+            case ESCAPE:
+                handleExit();
+                break;
+            case P:
+                isPaused = !isPaused;
+                break;
         }
     }
 
@@ -221,25 +236,41 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             int sleepTime = 3;
             for (int i = 0; i < 30; i++) {
                 if (xBreak == (sceneWidth - breakWidth) && direction == RIGHT) {
+                    wrapPaddle(true);
                     return;
                 }
                 if (xBreak == 0 && direction == LEFT) {
+                    wrapPaddle(false);
                     return;
                 }
-                xBreak = (direction == RIGHT) ? xBreak+1 : xBreak-1;
+
+                xBreak = (direction == RIGHT) ? xBreak + 1 : xBreak - 1;
                 centerBreakX = xBreak + halfBreakWidth;
+
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
                     return;
-                    //e.printStackTrace();
                 }
+
                 if (i >= 20) {
                     sleepTime = i;
                 }
             }
         }).start();
     }
+
+    private void wrapPaddle(boolean toRight) {
+        if (swap) {
+            if (toRight) {
+                xBreak = 0;
+            } else {
+                xBreak = sceneWidth - breakWidth;
+            }
+            centerBreakX = xBreak + halfBreakWidth;
+        }
+    }
+
     public static void resetColideFlags() {
         colideToBreak = false;
         colideToBreakAndMoveToRight = false;
@@ -255,11 +286,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             resetColideFlags();
             goDownBall = true;
         }
-        if (yBall + ballRadius >= sceneHeigt) {//ball hits bottom wall
+        if (yBall + ballRadius >= sceneHeight) {//ball hits bottom wall
             goDownBall = false;
             if (!isGoldStauts) {
                 heart--;
-                score.show((double) sceneWidth / 2, (double) sceneHeigt / 2, -1);
+                score.show((double) sceneWidth / 2, (double) sceneHeight / 2, -1);
                 if (heart < 1) {
                     Platform.runLater(()->{
                         displayView.retry.setOnAction(event -> gameReset(1));
@@ -346,6 +377,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }else{//if retry current level, or go to next level, no changes made to level
             retryFlag = 1;
         }
+        swap=false;
         heart = 3;
         start(primaryStage);
     }
@@ -393,18 +425,16 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             goDownBall = true;
         }
     }
-
     @Override
     public void onUpdate() {
-        if (isGoldStauts){
-            //put animation for chain lock on the heart label in displayview
-        }
-        updateGamePlayObjs();
-        if (isBallCollidingWithBlocks()) {
-            for (Block block : blocks) {
-                int hitCode = block.checkHitToBlock(xBall, yBall, ballRadius);
-                if (hitCode != Block.NO_HIT) {
-                    handleBlockHit(block, hitCode);
+        if (!isPaused) {
+            updateGamePlayObjs();
+            if (isBallCollidingWithBlocks()) {
+                for (Block block : blocks) {
+                    int hitCode = block.checkHitToBlock(xBall, yBall, ballRadius);
+                    if (hitCode != Block.NO_HIT) {
+                        handleBlockHit(block, hitCode);
+                    }
                 }
             }
         }
@@ -417,11 +447,14 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         if (block.hits >= 3) {
             score.incScore(1);
             score.show(block.x, block.y, 1);
-            block.blockIsHit();
+            Platform.runLater(() -> {
+                block.blockIsHit();
+                SpecialEffects.playBlockDebris(block.x,block.y,root);
+            });
             block.isDestroyed = true;
             Platform.runLater(() -> {
-                        block.rect.setVisible(false);
-                        root.getChildren().remove(block.rect);
+                block.rect.setVisible(false);
+                root.getChildren().remove(block.rect);
             });
             destroyedBlockCount++;
             resetColideFlags();
@@ -438,17 +471,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     @Override
     public void onPhysicsUpdate() {
-        checkDestroyedCount();
-        setPhysicsToBall();
-        if (time - goldTime > 5000) {
-            displayView.removeGold();
-            isGoldStauts = false;
+        if (!isPaused){
+            checkDestroyedCount();
+            setPhysicsToBall();
+            if (time - goldTime > 5000) {
+                displayView.removeGold();
+                isGoldStauts = false;
+            }
+            for (Bonus bonusObj : bonuses) {
+                bonusObj.checkIsTaken();
+                bonusObj.y += ((time - bonusObj.timeCreated) / 1000.000) + 1.000;
+            }
         }
-        for (Bonus bonusObj : bonuses) {
-            bonusObj.checkIsTaken();
-            bonusObj.y += ((time - bonusObj.timeCreated) / 1000.000) + 1.000;
-        }
-
     }
 
     @Override

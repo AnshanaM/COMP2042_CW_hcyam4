@@ -14,6 +14,7 @@ public class Bonus implements Serializable {
     public double y;
     public long timeCreated;
     public boolean taken = false;
+    public int type;
 
     public Bonus(int row, int column) {
         x = (column * (Block.getWidth())) + Block.getPaddingH() + (Block.getWidth() / 2) - 15;
@@ -28,24 +29,46 @@ public class Bonus implements Serializable {
         bonus.setX(x);
         bonus.setY(y);
         String url;
-        if (new Random().nextInt(20) % 2 == 0) {
-            url = "bonus1.png";
-        } else {
-            url = "bonus2.png";
+        int r = new Random().nextInt(20) % 3;
+        if (r == 0) {
+            url = "coins.png";
+            type = 0;
+        } else if (r == 1){
+            url = "treasure.png";
+            type = 1;
+        }
+        else{
+            url = "penalty.png";
+            type = 2;
         }
         bonus.setFill(new ImagePattern(new Image(url)));
     }
 
     public void checkIsTaken(){
-        if ((this.x + bonus.getWidth()) > Main.sceneHeigt || this.taken) {
+        if ((this.x + bonus.getWidth()) > Main.sceneHeight || this.taken) {
             return;
         }
         if ((this.y+ bonus.getHeight()) >= Main.yBreak && this.y <= (Main.yBreak + Main.breakHeight) && (this.x+bonus.getWidth()) >= Main.xBreak && this.x <= Main.xBreak + Main.breakWidth) {
-            System.out.println("You Got it and +3 score for you");
-            this.taken = true;
-            this.bonus.setVisible(false);
-            Main.score.incScore(3);
-            Main.score.show(this.x, this.y, 3);
+            if (type == 0){
+                System.out.println("You Got it and +3 score for you");
+                this.taken = true;
+                this.bonus.setVisible(false);
+                Main.score.incScore(3);
+                Main.score.show(this.x, this.y, 3);
+            }
+            else if (type == 1){
+                System.out.println("You Got it and +5 score for you");
+                this.taken = true;
+                this.bonus.setVisible(false);
+                Main.score.incScore(5);
+                Main.score.show(this.x, this.y, 5);
+            }
+            else{
+                this.taken = true;
+                this.bonus.setVisible(false);
+                Main.swap = true;
+            }
+
         }
     }
 

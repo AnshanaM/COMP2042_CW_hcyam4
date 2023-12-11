@@ -48,6 +48,7 @@ public class LoadSave {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Main.swap = inputStream.readBoolean();
         } catch (IOException e) {
             System.out.println("no games saved previously");
             return false;
@@ -94,7 +95,7 @@ public class LoadSave {
                 outputStream.writeBoolean(Main.colideToTopBlock);
 
                 outputStream.writeObject(blockSerializables);
-
+                outputStream.writeBoolean(Main.swap);
                 score.showMessage("Game Saved", main);
 
             } catch (IOException e) {
