@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SplittableRandom;
 
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
 
@@ -35,7 +34,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static boolean isGoldStauts      = false;
     protected static boolean isExistHeartBlock = false;
     public static Rectangle rect;
-    public static Rectangle bgGold;
+    public static Rectangle bgGold,portals;
     public static int ballRadius = 10;
     protected static int destroyedBlockCount = 0;
     private final double v = 2.000;
@@ -285,14 +284,17 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         if (yBall<= 0) {//ball hits top wall
             resetColideFlags();
             goDownBall = true;
+            Platform.runLater(()->SpecialEffects.playSound("/ball_wall.wav"));
         }
         if (yBall + ballRadius >= sceneHeight) {//ball hits bottom wall
             goDownBall = false;
             if (!isGoldStauts) {
+                Platform.runLater(()->SpecialEffects.playSound("/ball_out.wav"));
                 heart--;
                 score.show((double) sceneWidth / 2, (double) sceneHeight / 2, -1);
                 if (heart < 1) {
                     Platform.runLater(()->{
+                        SpecialEffects.playSound("/gameover.wav");
                         displayView.retry.setOnAction(event -> gameReset(1));
                         displayView.backToMenu.setOnAction(event -> gameReset(0));
                         displayView.gameOverMenu.getChildren().addAll(displayView.backToMenu,displayView.retry);
@@ -303,11 +305,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
         if (xBall + ballRadius >= sceneWidth) {//ball hits right wall
+            Platform.runLater(()->SpecialEffects.playSound("/ball_wall.wav"));
             resetColideFlags();
             goRightBall = false;
             xBall = sceneWidth - ballRadius;
         }
         if (xBall - ballRadius <= 0) {
+            Platform.runLater(()->SpecialEffects.playSound("/ball_wall.wav"));
             resetColideFlags();
             goRightBall = true;
             xBall = ballRadius;
@@ -334,6 +338,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private void checkDestroyedCount() {
         if (destroyedBlockCount == blocks.size()) {
             System.out.println("You Win");
+            Platform.runLater(()->SpecialEffects.playSound("/youwin.wav"));
             if (score.checkHighScore(score.getScore())){
                 System.out.println("\nnew highscore!");
                 Platform.runLater(()->{
@@ -349,7 +354,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     displayView.nextLevel.setOnAction(event -> nextLevel());
                     displayView.backToMenu.setOnAction(event -> gameReset(0));
                 });
-//                engine.start();
+                engine.start();
             }
             engine.stop();
         }
@@ -444,6 +449,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 && yBall <= (Block.getHeight() * (level + 2)) + Block.getPaddingTop();
     }
     private void handleBlockHit(Block block, int hitCode) {
+        Platform.runLater(()->SpecialEffects.playSound("/ball_block.wav"));
         if (block.hits >= 3) {
             score.incScore(1);
             score.show(block.x, block.y, 1);

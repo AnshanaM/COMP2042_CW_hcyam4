@@ -10,6 +10,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
+import static brickGame.Main.portals;
+
 public class DisplayView {
     public static VBox mainMenu,gameOverMenu,winMenu,betHighScoreMenu;
     public static HBox gamePlayStats;
@@ -170,4 +172,15 @@ public class DisplayView {
         Main.root.getChildren().add(betHighScoreMenu);
     }
 
+    public static void displayPortals(){
+        portals = new Rectangle();
+        portals.setWidth(Main.sceneWidth);
+        portals.setHeight(Main.sceneHeight);
+        portals.setX(0);
+        portals.setY(0);
+        ImagePattern pattern = new ImagePattern(new Image("portals.png"));
+        portals.setFill(pattern);
+        Main.root.getChildren().add(portals);
+        Main.portals.setVisible(true);
+    }
 }

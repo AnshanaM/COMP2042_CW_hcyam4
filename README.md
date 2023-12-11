@@ -92,6 +92,9 @@ moved some functions to bonus class, block class when making functions in main c
 added exit game using ESCAPE key
 added pause resume button using the P key
 applied new penalty in bonus class, it makes the break wrap around the screen added to loadSave
+------
+created separate branch called addSound
+added sound effects
 
 
 ## Simplification
@@ -132,7 +135,7 @@ applied new penalty in bonus class, it makes the break wrap around the screen ad
 13. clean collision detection! [DONE]
 14. menupage and score can be singleton class
 15. check design patterns and implement it
-16. sound effects?
+16. sound effects? [DONE]
 17. gold time progress bar?
 18. make DISPLAYVIEW singleton
 18. delet unecessary files from github [DONE]

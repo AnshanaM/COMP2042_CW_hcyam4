@@ -1,7 +1,6 @@
 package brickGame;
 
 import javafx.animation.*;
-import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -9,11 +8,18 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpecialEffects {
     static ImageView debrisImage;
+//    private void setSound(String fileName){
+//        String soundFile = Main.class.getResource("/ball_paddle.wav").toString();
+//        MediaPlayer mediaPlayer = new MediaPlayer(new Media(soundFile));
+//    }
+
     public static ImageView heartImage = new ImageView("heartImage.jpg");
     public static void playLabelAnimation(Label labelToAnimate, Pane root) {
         labelToAnimate.setVisible(true);
@@ -108,4 +114,17 @@ public class SpecialEffects {
     public static void addImageView(final ImageView img, Pane root){
         root.getChildren().add(img);
     }
+    private static MediaPlayer setMediaPlayer(String sound){
+        String soundFile = Main.class.getResource(sound).toString();
+        return new MediaPlayer(new Media(soundFile));
+    }
+
+    public static void playSound(String soundFile) {
+        MediaPlayer mPlayer = setMediaPlayer(soundFile);
+        mPlayer.play();
+        mPlayer.setOnEndOfMedia(() -> mPlayer.dispose());
+    }
+
+
+
 }
