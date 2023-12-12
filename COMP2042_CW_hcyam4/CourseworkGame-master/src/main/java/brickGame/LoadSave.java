@@ -1,8 +1,10 @@
+/**
+ * Manages loading and saving game state using serialization.
+ */
 package brickGame;
 
 import java.io.*;
 import java.util.ArrayList;
-
 
 public class LoadSave {
     private static LoadSave instance;
@@ -13,13 +15,22 @@ public class LoadSave {
     private LoadSave(){
         //no initilaising required in this class
     }
+    /**
+     * Gets the instance of LoadSave, creating one if it doesn't exist.
+     *
+     * @return The instance of LoadSave
+     */
     public static LoadSave getInstance() {
         if (instance == null) {
             instance = new LoadSave();
         }
         return instance;
     }
-
+    /**
+     * Loads the game state from a serialized file.
+     *
+     * @return True if the game was successfully loaded, false otherwise
+     */
     public boolean loadGame() {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(savePath)));
@@ -64,7 +75,11 @@ public class LoadSave {
         }
         return true;
     }
-
+    /**
+     * Saves the game state to a serialized file.
+     *
+     * @param blockSerializables The list of BlockSerializable objects to be saved
+     */
     public void saveGame(ArrayList<BlockSerializable> blockSerializables) {
         new Thread(() -> {
             new File(savePathDir).mkdirs();

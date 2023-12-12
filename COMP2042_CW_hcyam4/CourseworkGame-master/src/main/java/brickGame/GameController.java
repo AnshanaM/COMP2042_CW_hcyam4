@@ -1,3 +1,7 @@
+/**
+ * The GameController class manages user input events and game control actions.
+ * It provides methods for handling keyboard events, paddle movement, and common setup for game resets.
+ */
 package brickGame;
 
 import javafx.scene.input.KeyEvent;
@@ -13,13 +17,20 @@ public class GameController{
     private GameController() {
         //nothing to initialise here
     }
+    /**
+     * Gets the singleton instance of the GameController class.
+     *
+     * @return The GameController instance.
+     */
     public static GameController getInstance(){
         if (instance == null) {
             instance = new GameController();
         }
         return instance;
     }
-
+    /**
+     * Handles the exit action by stopping the game engine and closing the application window.
+     */
     private static void handleExit(){
         try {
             Main.gameEngine.stop();
@@ -29,7 +40,11 @@ public class GameController{
             System.out.println("Issue in handling exit");
         }
     }
-
+    /**
+     * Handles keyboard events, including paddle movement, game saving, exiting, pausing, and resuming.
+     *
+     * @param event The KeyEvent representing the keyboard event.
+     */
     public static void handle(KeyEvent event) {
         switch (event.getCode()) {
             case LEFT:
@@ -61,6 +76,11 @@ public class GameController{
                 break;
         }
     }
+    /**
+     * Moves the paddle in the specified direction (LEFT or RIGHT).
+     *
+     * @param direction The direction of paddle movement (LEFT or RIGHT).
+     */
     private static void movePaddle(final int direction) {
         new Thread(() -> {
             int sleepTime = 3;
@@ -88,6 +108,12 @@ public class GameController{
             }
         }).start();
     }
+    /**
+     * Common setup for the next game reset, including updating display objects, resetting game parameters,
+     * clearing the game board, and handling level progression.
+     *
+     * @param isRetry Flag indicating whether the reset is due to a retry or moving back to the main menu.
+     */
     protected void nextResetCommonSetup(int isRetry) {
         DisplayView.updateObjs(Main.level,Score.getScore(),Main.heart);
         Main.loadFromSave = false;
@@ -124,6 +150,11 @@ public class GameController{
         Main.heart = 3;
         System.out.printf("/nheart: %d",Main.heart);
     }
+    /**
+     * Checks if the player has finished all levels and displays appropriate messages and options.
+     *
+     * @param main The Main class instance for accessing game state and UI elements.
+     */
     protected void checkFinishAllLevels(Main main){
         if (main.level>1){
                 main.displayView.showMessage("Level Up!");
@@ -135,7 +166,11 @@ public class GameController{
             main.displayView.winMenu.setVisible(true);
         }
     }
-
+    /**
+     * Starts the game engine with the specified frame rate and sets the action event handler.
+     *
+     * @param main The Main class instance for accessing game state and UI elements.
+     */
     protected void startGameEngine(Main main){
         main.gameEngine.getInstance();
         main.gameEngine.setOnAction(main);

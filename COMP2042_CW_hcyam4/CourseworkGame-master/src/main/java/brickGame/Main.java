@@ -1,3 +1,8 @@
+
+/**
+ * The main class that represents the entry point of the Brick Breaker game.
+ * It extends the JavaFX Application class and implements the EventHandler and GameEngine.OnAction interfaces.
+ */
 package brickGame;
 
 import javafx.application.Application;
@@ -77,7 +82,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     static LoadSave loadSave = LoadSave.getInstance();
     static SpecialEffects specialEffects = SpecialEffects.getInstance();
     static GameController gameController = GameController.getInstance();
-
+    /**
+     * Initializes the primary stage of the JavaFX application.
+     *
+     * @param primaryStage The primary stage of the application
+     */
     private void initStage(Stage primaryStage){
         Main.primaryStage = primaryStage;
         displayView = DisplayView.getInstance();
@@ -124,6 +133,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
         return false;
     }
+    /**
+     * Handles the JavaFX start method, initializing the primary stage and setting up the game.
+     *
+     * @param primaryStage The primary stage of the application
+     */
     @Override
     public void start(Stage primaryStage) {
         initStage(primaryStage);
@@ -163,6 +177,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             gameController.startGameEngine(this);
         }
     }
+    /**
+     * Handles key events in the game.
+     *
+     * @param event The key event
+     */
     @Override
     public void handle(KeyEvent event) {
         gameController.handle(event);
@@ -178,6 +197,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             //centerBreakX = xBreak + halfBreakWidth;
         }
     }
+    /**
+     * resets all the collide flags
+     */
     protected static void resetColideFlags() {
         colideToBreak = false;
         colideToBreakAndMoveToRight = false;
@@ -188,6 +210,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         colideToLeftBlock = false;
         colideToTopBlock = false;
     }
+    /**
+     * checks wall collisions with ball and plays sound
+     */
     private void checkWallCollisions(){
         if (yBall<= 0) {//ball hits top wall
             resetColideFlags();
@@ -222,6 +247,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             xBall = ballRadius;
         }
     }
+    /**
+     * checks break paddle collisions with ball
+     */
     private void checkBreakCollisions(){
         if (yBall >= yBreak - ballRadius && yBall <= yBreak + breakHeight + ballRadius &&
                 xBall + ballRadius >= xBreak && xBall - ballRadius <= xBreak + breakWidth) {
@@ -234,12 +262,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             goRightBall = colideToBreakAndMoveToRight;
         }
     }
+    /**
+     * updates ball positions and checks for collisions
+     */
     private void setPhysicsToBall() {
         yBall = goDownBall ? yBall + vY : yBall - vY;
         xBall = goRightBall ? xBall + vX : xBall - vX;
         checkWallCollisions();
         checkBreakCollisions();
     }
+    /**
+     * checks count of how many blocks were destroyed
+     */
     private void checkDestroyedCount() {
         if (destroyedBlockCount == blocks.size()) {
             System.out.println("You Win");
@@ -262,6 +296,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             gameEngine.stop();
         }
     }
+    /**
+     * Handles advancing to the next level in the game.
+     * Hides the win menu, resets common setups for the next level, and starts the next level.
+     */
+
     protected void nextLevel() {
         try {
             displayView.winMenu.setVisible(false);
@@ -271,6 +310,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             System.out.println("Issue in loading the next level");
         }
     }
+    /**
+     * Resets the game state when retrying or going back to the menu.
+     * Hides the game over menu, stops the game engine, resets common setups, starts the game, and sets back to the menu.
+     *
+     * @param isRetry Flag indicating if the reset is due to a retry
+     */
     protected void gameReset(int isRetry) {
         try {
             displayView.gameOver.setVisible(false);
@@ -282,7 +327,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             System.out.println("Issue in going back to the menu");
         }
     }
-
+    /**
+     * Updates the running game objects during the game loop.
+     */
     private void updateGameRunningObjs(){
         Platform.runLater(() -> {
             DisplayView.updateObjs(level,Score.getScore(),heart);
@@ -295,6 +342,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         });
     }
+    /**
+     * Updates the direction of the ball based on the block hit code.
+     *
+     * @param hitCode The code indicating the type of block hit
+     */
+
     private void updateBallDirection(int hitCode){
         if (hitCode == Block.HIT_RIGHT) {
             goRightBall = false;
@@ -306,6 +359,10 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             goDownBall = true;
         }
     }
+    /**
+     * Handles the update phase of the game loop.
+     * Updates the running game objects and checks for collisions with blocks.
+     */
     @Override
     public void onUpdate() {
         if (!isPaused) {
@@ -320,10 +377,21 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
     }
+    /**
+     * Checks if the ball is colliding with blocks within the visible game area.
+     *
+     * @return True if the ball is colliding with blocks, false otherwise
+     */
     private boolean isBallCollidingWithBlocks() {
         return yBall + ballRadius >= Block.getPaddingTop()
                 && yBall <= (Block.getHeight() * (level + 2)) + Block.getPaddingTop();
     }
+    /**
+     * Handles the collision and response when the ball hits a block.
+     *
+     * @param block   The block that was hit
+     * @param hitCode The code indicating the type of hit (e.g., HIT_RIGHT, HIT_BOTTOM)
+     */
     private void handleBlockHit(Block block, int hitCode) {
         Platform.runLater(()->specialEffects.playSound("/ball_block.wav"));
         if (block.hits >= 3) {
@@ -351,6 +419,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public void onInit() {
         //no implementation needed here
     }
+    /**
+     * Handles the physics update phase of the game loop.
+     */
     @Override
     public void onPhysicsUpdate() {
         if (!isPaused){
@@ -366,10 +437,20 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
     }
+    /**
+     * Handles the time update phase of the game loop.
+     *
+     * @param time The current time in the game
+     */
     @Override
     public void onTime(long time) {
         Main.time = time;
     }
+    /**
+     * The main method that launches the JavaFX application.
+     *
+     * @param args The command-line arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }

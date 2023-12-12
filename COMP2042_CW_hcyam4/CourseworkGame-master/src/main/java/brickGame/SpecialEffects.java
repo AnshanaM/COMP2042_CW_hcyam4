@@ -1,3 +1,6 @@
+/**
+ * handles all the animation and sound effects of the game
+ */
 package brickGame;
 
 import javafx.animation.*;
@@ -21,14 +24,24 @@ public class SpecialEffects {
     private SpecialEffects() {
         heartImage = new ImageView("heartImage.jpg");
     }
-
+    /**
+     * Gets the singleton instance of the SpecialEffects class.
+     *
+     * @return The singleton instance of the SpecialEffects class
+     */
     public static SpecialEffects getInstance() {
         if (instance == null) {
             instance = new SpecialEffects();
         }
         return instance;
     }
-
+    /**
+     * Plays a scale and opacity animation for a label.
+     * After the animation finishes, the label is removed from the specified Pane.
+     *
+     * @param labelToAnimate The label to be animated
+     * @param root The Pane where the label is added
+     */
     public static void playLabelAnimation(Label labelToAnimate, Pane root) {
         labelToAnimate.setVisible(true);
         labelToAnimate.setScaleX(0);
@@ -43,7 +56,15 @@ public class SpecialEffects {
         timeline.setOnFinished(event -> removeLabel(labelToAnimate, root));
         timeline.play();
     }
-
+    /**
+     * Initializes an ImageView with the specified properties and adds it to the specified Pane.
+     *
+     * @param img The ImageView to be initialized
+     * @param x The x-coordinate of the ImageView
+     * @param y The y-coordinate of the ImageView
+     * @param height The height of the ImageView
+     * @param width The width of the ImageView
+     */
     public static void initObj(ImageView img, double x, double y, int height, int width) {
         img.setVisible(false);
         img.setX(x);
@@ -53,7 +74,14 @@ public class SpecialEffects {
         img.setOpacity(1.0);
         addImageView(img, Main.root);
     }
-
+    /**
+     * Plays a heart animation using an ImageView.
+     * The heart image moves from the specified coordinates to the heart label's position.
+     * After the animation finishes, the ImageView is removed from the root Pane.
+     *
+     * @param x The starting x-coordinate of the heart animation
+     * @param y The starting y-coordinate of the heart animation
+     */
     public static void playHeartAnimation(double x, double y) {
         initObj(heartImage, x, y, 35, 35);
         heartImage.setVisible(true);
@@ -79,7 +107,15 @@ public class SpecialEffects {
     }
 
     private static Timeline debrisTimeline;
-
+    /**
+     * Plays a block debris animation using an ImageView.
+     * The debris image scales and fades out over time.
+     * After the animation finishes, the ImageView is removed from the root Pane.
+     *
+     * @param x The x-coordinate of the debris animation
+     * @param y The y-coordinate of the debris animation
+     * @param root The root Pane where the debris ImageView is added
+     */
     public static void playBlockDebris(int x, int y, Pane root) {
         debrisImage = new ImageView("debris.png");
         initObj(debrisImage, x, y, 64, 87);
@@ -113,24 +149,48 @@ public class SpecialEffects {
         debrisTimeline.setCycleCount(1);
         debrisTimeline.play();
     }
-
+    /**
+     * Removes an ImageView from the specified root Pane.
+     *
+     * @param imageView The ImageView to be removed
+     * @param root The root Pane from which the ImageView is removed
+     */
     private static void removeImageView(ImageView imageView, Pane root) {
         root.getChildren().remove(imageView);
     }
-
+    /**
+     * Removes a Label from the specified root Pane.
+     *
+     * @param animatedLabel The Label to be removed
+     * @param root The root Pane from which the Label is removed
+     */
     private static void removeLabel(Label animatedLabel, Pane root) {
         root.getChildren().remove(animatedLabel);
     }
-
+    /**
+     * Adds an ImageView to the specified root Pane.
+     *
+     * @param img The ImageView to be added
+     * @param root The root Pane to which the ImageView is added
+     */
     public static void addImageView(final ImageView img, Pane root) {
         root.getChildren().add(img);
     }
-
+    /**
+     * Sets up a MediaPlayer for a specified sound file.
+     *
+     * @param sound The sound file path
+     * @return The initialized MediaPlayer
+     */
     private static MediaPlayer setMediaPlayer(String sound) {
         String soundFile = Main.class.getResource(sound).toString();
         return new MediaPlayer(new Media(soundFile));
     }
-
+    /**
+     * Plays a sound using a MediaPlayer. The MediaPlayer is disposed after the sound is played.
+     *
+     * @param soundFile The sound file path
+     */
     public static void playSound(String soundFile) {
         MediaPlayer mPlayer = setMediaPlayer(soundFile);
         mPlayer.play();

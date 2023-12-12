@@ -1,3 +1,9 @@
+/**
+ * The Block class represents individual bricks in the game. Each block can have different
+ * types, such as normal, chocolate, star, or heart. It provides methods for initializing the
+ * game board, checking collisions with the ball, and handling events when a block is hit.
+ *
+ */
 package brickGame;
 
 import javafx.application.Platform;
@@ -73,6 +79,15 @@ public class Block implements Serializable {
         rect.setFill(pattern);
 
     }
+    /**
+     * Checks if the ball collides with the current block and returns the direction of the collision.
+     *
+     * @param xBall      The x-coordinate of the ball.
+     * @param yBall      The y-coordinate of the ball.
+     * @param ballRadius The radius of the ball.
+     * @return An integer representing the direction of the collision.
+     *         Possible values: {@code HIT_RIGHT}, {@code HIT_BOTTOM}, {@code HIT_LEFT}, {@code HIT_TOP}, {@code NO_HIT}.
+     */
     public int checkHitToBlock(double xBall, double yBall, int ballRadius) {
         if (isDestroyed) {
             return NO_HIT;
@@ -107,12 +122,21 @@ public class Block implements Serializable {
         return block.width;
     }
 
+    /**
+     * fills the block instance with the random color image
+     */
     public void setBlockFill() {
         int r = new Random().nextInt(500);
         Image image = new Image(Main.colors[r % (Main.colors.length)]);
         ImagePattern pattern = new ImagePattern(image);
         rect.setFill(pattern);
     }
+    /**
+     * Initializes the game board with blocks based on the specified level.
+     *
+     * @param level The current level of the game.
+     */
+
     public static void initBoard(int level) {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < level+2; j++) {
@@ -141,6 +165,10 @@ public class Block implements Serializable {
             }
         }
     }
+    /**
+     * Handles the event when a block is hit by the ball. Performs actions based on the type
+     * of the block, such as creating bonuses or increasing the heart count.
+     */
     public void blockIsHit(){
         if (this.type == Block.BLOCK_CHOCO) {
             final Bonus newBonus = new Bonus(this.row, this.column);
