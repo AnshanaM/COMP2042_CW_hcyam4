@@ -93,8 +93,9 @@ Another issue was when the ball would freeze on screen, but it would move in the
 It took a while to figure out whether to dispose the mediaPlayer or to restart it, because the sound effects would get garbled and the sound would not stop. This was fixed by creating and initialising the media player in a separate function before playing it.   
 When going to the next level, or when a game needs to be retried, or when the player wishes to go back to menu,even if the buttons had been set to an action in the start method, the buttons never called the assigned methods.I had to set the functions of the buttons at every state game where the buttons were to be visible for them to work otherwise the buttons never function.  
 Initially, some labels that are displayed are frozen on screen. This is usually a problem that occurs at the beginning of the game when you first start playing it. This lagging is mainly due to the animation and sound effects applied to the game.  
+When loading from the file, there was a ConcurrentModificationException because the blocks array was being altered while being iterated through it. This was solved by using a different array to load the blocks into and then loading it to the main blocks array.
+When the player beats the high score and goes to the next level, the gameplay stats don't show the new highscore, the heart or the level number. But it shows the score. When the program moves control to the start function it should clear all objects in the root and then add them again. I have tried to explicitly remove it from the 
 
-  
 ## Refactoring
 ### Exceptions:  
  - UnsupportedThreadException: Occurred in the stop() function in the
@@ -112,7 +113,7 @@ Initially, some labels that are displayed are frozen on screen. This is usually 
  - Renamed meaningless identifiers to gameOverLabel and winLabel.
  - Made direct assignment to goRightBall and goDownBall in setPhysicsToBall in the Main class.
  - Renamed restartGame function to gameReset as it can be confused as retry game. This function reloads the whole game.
- - Used ternary operator for conditionaly statements to improve code readability.
+ - Used ternary operator for conditional statements to improve code readability.
 
 ### UI Improvements:
  - Placed the animation and display sections of the code into Platform.runLater() for better UI control.
@@ -128,4 +129,15 @@ Initially, some labels that are displayed are frozen on screen. This is usually 
  - Improved ball movement by setting vX and vY to fixed values in setPhysicsToBall instead of relying on relations logic with the break and ball positions, and the current level.
  - Removed unused variable oldXBreak.
  - Stopped the game after each level, displaying either winMenu, gameOverMenu or betHighScoreMenu.
- - Upon retrying a level, the heart and score atttributes are reinitialised; on proceeding to the next level, they remain unchanged; on going back to menu, the statistics are re-initialised.
+ - Upon retrying a level, the heart and score attributes are reinitialised; on proceeding to the next level, they remain unchanged; on going back to menu, the statistics are re-initialised.
+### Singleton Classes:
+ -  Score: 
+Single source of truth: There's only ever one score in the game, and having it as a singleton ensures consistent access and updates from anywhere in the code.
+ -  DisplayView: 
+Centralized UI control: By having a single DisplayView instance, you ensure consistent management of buttons, background image, and other UI elements. This simplifies logic and avoids redundancy.
+ -  SpecialEffects: 
+Resource efficiency: Media players and sound effects are often resource-intensive. Having a single instance managed by a singleton SpecialEffects class ensures efficient usage and avoids having multiple players competing for resources.
+ -  LoadSave: 
+Data consistency: Save/load operations are critical for maintaining game progress. A singleton LoadSave class guarantees consistent access to the save file and avoids potential data corruption from multiple instances.
+ -  GameEngine: 
+Thread management: Game engines often involve multiple threads for animations, physics, and other tasks. A singleton GameEngine simplifies thread management and ensures coordinated execution without conflicts.

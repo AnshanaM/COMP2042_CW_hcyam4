@@ -4,6 +4,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.paint.ImagePattern;
@@ -16,10 +17,12 @@ public class DisplayView {
     private static DisplayView instance;
     public static VBox mainMenu,gameOverMenu,winMenu,betHighScoreMenu;
     public static HBox gamePlayStats;
-    public static Label scoreLabel, heartLabel, levelLabel, title, youWin, gameOver,highScoreLabel,commentLabel;
+    public static Label scoreLabel, heartLabel, levelLabel, title, youWin, gameOver;
     public static Button load, newGame, tutorial, backToMenu, nextLevel, retry;
     public static ImageView tutorialPage = new ImageView(new Image("tutorial.png",Main.sceneWidth , Main.sceneHeight, false, true));
 
+    public static Label highScoreLabel = new Label();
+    public static Label  commentLabel = new Label();
     private DisplayView(){
         mainMenuInit();
         gamePlayScreenInit();
@@ -35,6 +38,7 @@ public class DisplayView {
         initBall();
         initBreak();
         tutorialPage.setVisible(false);
+        //highScoreMenu();
         //displayPortals();
     }
 
@@ -116,7 +120,7 @@ public class DisplayView {
 
     public static void updateObjs(int level, int score, int heart){
         gamePlayStats.setVisible(false);
-        gamePlayStats.getChildren().removeAll(scoreLabel,highScoreLabel,levelLabel,heartLabel);
+        gamePlayStats.getChildren().clear();
         levelLabel.setText("Level: " + level);
         scoreLabel.setText("Score: " + score);
         heartLabel.setText("Heart: " + heart);
@@ -166,14 +170,13 @@ public class DisplayView {
         highScoreLabel.setStyle("-fx-text-fill: #f5bd45; -fx-font-size: 45px; -fx-font-weight: bold;");
         commentLabel = new Label("YOU HAVE REACHED A NEW HIGHSCORE!");
         commentLabel.setStyle("-fx-text-fill: #f5bd45; -fx-font-size: 25px; -fx-font-weight: bold;");
-        backToMenu = new Button("BACK TO MENU");
-        nextLevel = new Button("NEXT LEVEL");
+        //backToMenu = new Button("BACK TO MENU");
+        //nextLevel = new Button("NEXT LEVEL");
         betHighScoreMenu = new VBox(20);
         betHighScoreMenu.getChildren().addAll(highScoreLabel,commentLabel,backToMenu,nextLevel);
         betHighScoreMenu.setLayoutX(100);
         betHighScoreMenu.setLayoutY(200);
-        betHighScoreMenu.setVisible(true);
-        Main.root.getChildren().add(betHighScoreMenu);
+        betHighScoreMenu.setVisible(false);
     }
 
     private static void addLabel(final Label labelToAdd) {
@@ -194,4 +197,62 @@ public class DisplayView {
         addLabel(scoreIncrement);
         Main.specialEffects.playLabelAnimation(scoreIncrement, Main.root);
     }
+
+    public void setBackToMenu(){
+        mainMenu.setVisible(true);
+        gamePlayStats.setVisible(false);
+        gameOverMenu.setVisible(false);
+        winMenu.setVisible(false);
+        betHighScoreMenu.setVisible(false);
+    }
+    public void setGameOver(Main main){
+        gameOverMenu.getChildren().removeAll(backToMenu,retry);
+        backToMenu.setOnAction(event -> main.gameReset(main.BACK));
+        retry.setOnAction(event -> main.gameReset(main.RETRY));
+        gameOverMenu.getChildren().addAll(backToMenu,retry);
+        gameOverMenu.setVisible(true);
+    }
+
+    public void setGamePlay(){
+        mainMenu.setVisible(false);
+        gamePlayStats.setVisible(true);
+    }
+    public void setNewGame(){
+        mainMenu.setVisible(false);
+        gamePlayStats.setVisible(true);
+    }
+    public void setTutorial(Pane root, Main main){
+        root.getChildren().add(tutorialPage);
+        tutorialPage.setVisible(true);
+        root.getChildren().remove(backToMenu);
+        backToMenu.setLayoutX(310);
+        backToMenu.setLayoutY(30);
+        root.getChildren().add(backToMenu);
+        backToMenu.setVisible(true);
+        backToMenu.setOnAction(menuEvent -> main.gameReset(main.BACK));
+    }
+    public void setBetHighScoreMenu(Pane root, Main main){
+        betHighScoreMenu.setVisible(true);
+        nextLevel.setOnAction(event -> {
+            highScoreLabel.setVisible(false);
+            root.getChildren().remove(betHighScoreMenu);
+            //gamePlayStats.getChildren().clear();
+            main.nextLevel();
+        });
+        backToMenu.setOnAction(event -> {
+            betHighScoreMenu.setVisible(false);
+            root.getChildren().remove(betHighScoreMenu);
+            //gamePlayStats.getChildren().clear();
+            main.gameReset(main.BACK);
+        });
+
+    }
+
+    public void setWinMenu(Main main){
+        winMenu.setVisible(true);
+        nextLevel.setOnAction(event -> main.nextLevel());
+        backToMenu.setOnAction(event -> main.gameReset(main.BACK));
+    }
+
+
 }

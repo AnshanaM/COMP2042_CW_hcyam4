@@ -61,9 +61,9 @@ public class Score {
         }
     }
 
-    public static boolean checkHighScore(int currentScore) {
-        if (currentScore >= highScore) {
-            setHighScore(currentScore);
+    public static boolean checkHighScore() {
+        if (score >= highScore) {
+            setHighScore(score);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(highScoreFile))) {
                 writer.write(Integer.toString(highScore));
             } catch (IOException e) {

@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
-public class GameController {
+public class GameController{
     private static GameController instance;
     private static final int LEFT  = 1;
     private static final int RIGHT = 2;
@@ -91,9 +91,9 @@ public class GameController {
     protected void nextResetCommonSetup(int isRetry) {
         DisplayView.updateObjs(Main.level,Score.getScore(),Main.heart);
         Main.loadFromSave = false;
-        Main.displayView.winMenu.setVisible(false);
-        Main.displayView.gameOverMenu.setVisible(false);
-        Main.displayView.mainMenu.setVisible(false);
+//        Main.displayView.winMenu.setVisible(false);
+//        Main.displayView.gameOverMenu.setVisible(false);
+//        Main.displayView.mainMenu.setVisible(false);
         Main.vX = 2.000;
         Main.vY = 2.000;
         Main.destroyedBlockCount = 0;
@@ -108,21 +108,39 @@ public class GameController {
         Main.blocks.clear();
         Main.bonuses.clear();
         Main.root.getChildren().clear();
-        if (isRetry == 0){//if going back to menu
+        if (isRetry == Main.BACK){//if going back to menu
             Main.level = 1;
-            Main.retryFlag = 0;
+            Main.retryFlag = Main.BACK;
 
-        }else if (isRetry == 1){
-            Main.retryFlag = 1;
+        }else if (isRetry == Main.RETRY){
+            Main.retryFlag = Main.RETRY;
             Main.score.setScore(0);
         }
         else{
             Main.level++;
-            Main.retryFlag=-1;
+            Main.retryFlag= Main.NEXT;
         }
         Main.teleport =false;
         Main.heart = 3;
         System.out.printf("/nheart: %d",Main.heart);
+    }
+    protected void checkFinishAllLevels(Main main){
+        if (main.level>1){
+                main.displayView.showMessage("Level Up!");
+        }
+        if (main.level > 7) {
+            main.displayView.backToMenu.setOnAction(event -> main.gameReset(main.BACK));
+            main.displayView.winMenu.getChildren().removeAll(main.displayView.nextLevel,Main.displayView.backToMenu);
+            main.displayView.winMenu.getChildren().add(main.displayView.backToMenu);
+            main.displayView.winMenu.setVisible(true);
+        }
+    }
+
+    protected void startGameEngine(Main main){
+        main.gameEngine.getInstance();
+        main.gameEngine.setOnAction(main);
+        main.gameEngine.setFps(150);
+        main.gameEngine.start();
     }
 
 }

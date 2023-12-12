@@ -15,8 +15,6 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Math.ceil;
-
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
     protected static int level = 1;
     protected static double xBreak = 250.0f;
@@ -67,7 +65,10 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     protected static boolean colideToTopBlock            = false;
     protected static double vX = 2.000;
     protected static double vY = 2.000;
-    protected static int retryFlag = 0;
+    static final int NEXT = -1;
+    static final int RETRY = 1;
+    static final int BACK = 0;
+    protected static int retryFlag = BACK;
     protected static boolean isPaused = false;
     protected static boolean teleport = false;
     static DisplayView displayView;
@@ -88,14 +89,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         primaryStage.getIcons().add(icon);
         Platform.runLater(() -> {
             primaryStage.show();
+            root.getChildren().clear();
             root.getChildren().addAll(background,bgGold, rect, ball, displayView.mainMenu, displayView.gamePlayStats, displayView.gameOverMenu, displayView.winMenu);
             for (Block block : blocks) {
                 root.getChildren().add(block.rect);
             }
-            if (retryFlag == 1){
-                displayView.mainMenu.setVisible(false);
-            }
-
         });
     }
 
@@ -103,7 +101,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         if (loadSave.loadGame()){
             loadFromSave = true;
             System.out.printf("\nscore loaded: %d\n",score.getScore());
-            //temporary blocks array to prevent concurrent modification of the blocks during runtime
             List<Block> loadedBlocks = new ArrayList<>();
             for (BlockSerializable ser : loadSave.blocks) {
                 loadedBlocks.add(new Block(ser.row, ser.j, "concrete.jpg", ser.type));
@@ -113,13 +110,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 bonuses.clear();
                 displayView.updateObjs(level,score.getScore(),heart);
                 blocks.addAll(loadedBlocks);
-                displayView.mainMenu.setVisible(false);
-                displayView.gamePlayStats.setVisible(true);
+                displayView.setGamePlay();
                 if (teleport) {
                     displayView.showMessage("TELEPORT");
                 }
             });
-
             try {
                 start(primaryStage);
                 return true;
@@ -133,38 +128,20 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     @Override
     public void start(Stage primaryStage) {
         initStage(primaryStage);
-        if (level>1){
-            Platform.runLater(() -> {
-                displayView.showMessage("Level Up!");
-            });
-        }
-        if (level > 7) {
-            Platform.runLater(() -> {
-                //DISPLAY CHAMPION PAGE
-                displayView.backToMenu.setOnAction(event -> gameReset(0));
-                displayView.winMenu.getChildren().removeAll(displayView.nextLevel,displayView.backToMenu);
-                displayView.winMenu.getChildren().add(displayView.backToMenu);
-            });
-            return;
-        }
+        Platform.runLater(()->gameController.checkFinishAllLevels(this));
         if (!loadFromSave) {
-            if ((level > 1 && level < 7) || (retryFlag == 1)) {
+            if ((level > 1 && level < 7) || (retryFlag == RETRY)) {
                 Platform.runLater(() -> {
-                    displayView.mainMenu.setVisible(false);
-                    displayView.gamePlayStats.setVisible(true);
+                    displayView.setGamePlay();
                 });
-                gameEngine.getInstance();
-                gameEngine.setOnAction(this);
-                gameEngine.setFps(150);
-                gameEngine.start();
+                gameController.startGameEngine(this);
             }
-
             displayView.load.setOnAction(event -> {
                 root.getChildren().clear();
                 if (!checkLoad()){
                     try {
-                        displayView.mainMenu.setVisible(true);
-                        displayView.gamePlayStats.setVisible(false);
+                        root.getChildren().clear();
+                        gameReset(BACK);
                         loadFromSave=false;
                         start(primaryStage);
                     }
@@ -173,35 +150,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     }
                 }
             });
-
             displayView.newGame.setOnAction(event -> {
                 loadFromSave=false;
-                gameEngine.getInstance();
-                gameEngine.setOnAction(Main.this);
-                gameEngine.setFps(150);
-                gameEngine.start();
-                displayView.mainMenu.setVisible(false);
-                displayView.gamePlayStats.setVisible(true);
-
+                gameController.startGameEngine(this);
+                displayView.setNewGame();
             });
-
             displayView.tutorial.setOnAction(event -> {
-                root.getChildren().add(displayView.tutorialPage);
-                displayView.tutorialPage.setVisible(true);
-                root.getChildren().remove(displayView.backToMenu);
-                displayView.backToMenu.setLayoutX(310);
-                displayView.backToMenu.setLayoutY(30);
-                root.getChildren().add(displayView.backToMenu);
-                displayView.backToMenu.setVisible(true);
-                displayView.backToMenu.setOnAction(menuEvent -> gameReset(0));
+                displayView.setTutorial(root,this);
 
             });
         } else {
-            gameEngine.getInstance();
-            gameEngine.setOnAction(this);
-            gameEngine.setFps(150);
             loadFromSave = false;
-            gameEngine.start();
+            gameController.startGameEngine(this);
 
         }
     }
@@ -248,11 +208,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 if (heart < 1) {
                     Platform.runLater(()->{
                         specialEffects.playSound("/gameover.wav");
-                        displayView.gameOverMenu.getChildren().removeAll(displayView.backToMenu,displayView.retry);
-                        displayView.retry.setOnAction(event -> gameReset(1));
-                        displayView.backToMenu.setOnAction(event -> gameReset(0));
-                        displayView.gameOverMenu.getChildren().addAll(displayView.backToMenu,displayView.retry);
-                        displayView.gameOverMenu.setVisible(true);
+                        displayView.setGameOver(this);
                     });
                     gameEngine.stop();
                 }
@@ -293,43 +249,28 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         if (destroyedBlockCount == blocks.size()) {
             System.out.println("You Win");
             Platform.runLater(()->specialEffects.playSound("/youwin.wav"));
-            if (score.checkHighScore(score.getScore())){
+            if (score.checkHighScore()){
                 System.out.println("\nnew highscore!");
                 Platform.runLater(()->{
                     displayView.highScoreMenu();
-                    displayView.nextLevel.setOnAction(event -> {
-                        displayView.highScoreLabel.setVisible(false);
-                        root.getChildren().remove(displayView.betHighScoreMenu);
-                        //root.getChildren().add(displayView.gamePlayStats);
-                        nextLevel();
-                    });
-                    displayView.backToMenu.setOnAction(event -> {
-                        displayView.betHighScoreMenu.setVisible(false);
-                        root.getChildren().remove(displayView.betHighScoreMenu);
-                        //root.getChildren().add(displayView.gamePlayStats);
-                        gameReset(0);
-                    });
-                    displayView.tutorial.setOnAction(event -> {
-                        displayView.tutorialPage.setVisible(true);
-                        //gameReset(0);
-                    });
+                    root.getChildren().add(displayView.betHighScoreMenu);
+                    displayView.setBetHighScoreMenu(root,this);
                 });
-                gameEngine.start();
+                //gameEngine.start();
             }
             else{
                 Platform.runLater(()->{
-                    displayView.winMenu.setVisible(true);
-                    displayView.nextLevel.setOnAction(event -> nextLevel());
-                    displayView.backToMenu.setOnAction(event -> gameReset(0));
+                    displayView.setWinMenu(this);
                 });
-                gameEngine.start();
+                //gameEngine.start();
             }
             gameEngine.stop();
         }
     }
-    private void nextLevel() {
+    protected void nextLevel() {
         try {
-            gameController.nextResetCommonSetup(-1);
+            displayView.winMenu.setVisible(false);
+            gameController.nextResetCommonSetup(NEXT);
             start(primaryStage);
         } catch (Exception e) {
             System.out.println("Issue in loading the next level");
@@ -337,11 +278,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
     protected void gameReset(int isRetry) {
         try {
+            displayView.gameOver.setVisible(false);
             gameEngine.stop();
             gameController.nextResetCommonSetup(isRetry);
             start(primaryStage);
-            displayView.mainMenu.setVisible(true);
-            displayView.gamePlayStats.setVisible(false);
+            displayView.setBackToMenu();
         } catch (Exception e) {
             System.out.println("Issue in going back to the menu");
         }
