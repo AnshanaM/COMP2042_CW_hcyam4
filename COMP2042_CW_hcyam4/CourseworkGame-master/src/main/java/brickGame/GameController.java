@@ -59,10 +59,6 @@ public class GameController {
                 Main.displayView.showMessage("GAME RESUMED");
             }
                 break;
-            case B:
-                //remove tutorial bg and call gameReset
-                Main.displayView.tutorialPage.setVisible(false);
-                Main.retryFlag=0;
         }
     }
     private static void movePaddle(final int direction) {

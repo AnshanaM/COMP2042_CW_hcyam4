@@ -34,7 +34,6 @@ public class DisplayView {
         Main.primaryStage.setScene(Main.scene);
         initBall();
         initBreak();
-        Main.root.getChildren().add(tutorialPage);
         tutorialPage.setVisible(false);
         //displayPortals();
     }

@@ -1,162 +1,131 @@
+
 # COMP2042_CW_hcyam4
 
 ## Compilation Instructions:
-Provide a clear, step-by-step guide on how to compile the
-code to produce the application. Include any dependencies or special settings
-required.
-## Implemented and Working Properly: 
-List the features that have been successfully
-implemented and are functioning as expected. Provide a brief description of each. 
-### Problems solved and simple refactoring
-1. UnsupportedThreadException occurred in the stop() function in the GameEngine class. This was solved by utilizing the interrupt() function instead of the stop() function for all the 3 different threads; physicsThread, updatethread and the timeThread.
-2. InterruptedException occurred in all the overridden run() functions of the GameEngine class. This was fixed by placing return statements in the catch blocks.
-3. Load button was created in the Main class but wsa not visible. Added it to the root of Pane().
-4. Altered numerous meaningless identifier names to meaningful ones such as scoreIncrement, message, msg, etc.
-5. NullPointerException occurred when saving the state of the game. This was fixed by using the assert statement to prevent the null pointer from the outputStream.flush() function in the saveGame() method of the LoadSave class.
-6. The save directory that was created was always saved in local disk C. The location was changed to the relative path of the project directory for ease of access and because it is best to store the related files in the same directory.
-7. The Initialise method in the GameEngine class only called one function (onAction,OnInit()), so I removed this method and directly called the function.
-8. The label animations would freeze and remain on the screen. This was because there was a new thread being created for every label to be animated. This issue was fixed by placing the animation section of the code into PLatform.runLater(). It is common practice to wrap UI components inside the Platform.runLater().
-9. Meaningless identifier labels were changed to gameOverLabel and winLabel. 
-10. There was an IO Exception when there are no existing saved games. Handled this by outputting that no games were saved and removed the print stack trace.
-11. Made direct assingments to goRightBall and goDownBall in setPhysicsToBall in Main class instead of assigning to colideToRightBlock, colideToTopBlock, colideToBottomBlock and colideToLeftBlock and finally assigning to goRightBall and goDownBall.
-12. I have used lambda expressions for anonymous methods in Platform.runLater() calls.
-13. I have transferred the load and save logic from the Main class to the LoadSave class. It is more appropriate that it is in this class than in the Main.
-14. Because of transferring the load and save to the LoadSave class, I have removed the read function. This function previously served as the intermediary function but now since all the data is streamed directly into the load function, there was no need of the read function.
-15. Since I have changed the graphics of the game, the identifier choco was not appropriate, so I changed it to bonus or bonusObj in some cases.
-16. Changed name of move function in GameController class to movePaddle because it is not specific enough since there are other moving objects in the game.
-17. Since, I have decided to initalise the bricks with one colour, some unnecessary lines of code was removed from the Block class like creating new Image and new Image patterns. 
-18. The logic for the ball initialising was flawed since it was initialised to a random position and always started by moving downwards. From a players perspective this is unfair, because there can be cases when the position can be at the bottom wall where the player would immediately lose a life before starting to play. Because of this, I removed the randomly generated positions and initalised it so that it will start moving upwards from the center of the break paddle.
-19. To prevent unnecessary modifications to the score attribute of the Score class, I have set it to private and added getter and setter methods for it.
-20. named restartGame to gameReset as it resets the complete game and the level will being from level 1. This can be easily confused with retry game.
-21. Significantly reduced the number of lines and improved code readability by using the ternary operator for conditional statements like for assigning goRightBall and goLeftBall.
-22. Moved the initBoard function to the Block class and made it static so that it would not be included in instances of the Block class.
-23. Made the collision detection for the blocks and the break paddle with the ball better by including the ball radius into the comparisons.
-24. When the ball would hit the break at the center, the ball would move really slowly. It only moved faster when it hit the edges of the break. I improved the ball movement by changing the way it was coded to move by removing the relations logic method of calculating the vX and vY. Instead, I just set the vX and vY to a fixed value in setPhysicsToBall() function and incremented the ball x and y conditions. This issue was caused by the balls speed that would depend on the current level, break and ball position.
-25. Did not use the oldXBreak variable, so I removed it.
-25. Stopped the game after each level, displayed either winMenu, betHighScoreMenu, or gameOverMenu. The player can then choodse whether to proceed to the next level, retry the current level or go back to menu.
-26. When the player retries a level, heart and score is reinitialised to 3 and 0.
-27. When the player proceeds to the next level, heart and score will not change.
-28. When the player goes back to menu, the statistics are reset and the heart, score and level are reinitialised.
-29. 
+### **1. Prerequisites:**
+-   Install Java Development Kit (JDK) 19.0.2
+- Install JavaFX SDK 21.0.1
+-   Download and install IntelliJ IDEA or any Java IDE.
+-   Ensure you have Maven set up in IntelliJ.
+
+### **2. Open the Project in IntelliJ:**
+
+-   Open the project folder containing the Java files and pom.xml in IntelliJ.
+-   If prompted, select "Import Project" and choose "Maven" as the project type.
+
+### **3. Verify JavaFX Library:**
+
+-   Open Project Structure (File > Project Structure).
+- Go to "Libraries" and click the "+" button and select "Java".
+- Find the Java directory in Program Files and select "lib" inside the JavaFX SDK directory.
+- Apply the changes.
 
 
+### **4. Mark Resources Folder:**
+-   Open the project directory in your IntelliJ file explorer.
+-   Locate the folder containing the game assets (images, sounds, etc.).
+-   Right-click the folder and select "Mark Directory as > Resources Root".
 
-## rough updates
-made the {LIST THE DIFFERENT VARIABLES} protected static so that it can be accessed directly
-from other classes and can be manipulated without using temporary variables like in LoadSave class
-made Animation class to add the animations to the different labels and to remove the label
-added heart animation
-added debris animation
-added soundeffects
-------
-fixed load game
-fixed score heart label by using text wrap
-------
-3 level brick breakability works now
-------
-made setPhysicstoball shorter by separting the wall and break collisions into 2 other functions and calling them
-made start function shorter by doing the displays in menuPage constructor
-made loadgame.setonaction shorter by making new function called checkLoad for bobs coding conventions because it
-had more than 5 indents
-added new functoins to displayview class for adding and removing gold status views
-added new function to bonus called checkistaken
-added highscore functionality using file handling
-moved some functions to bonus class, block class when making functions in main class shorter
-------
-added exit game using ESCAPE key
-added pause resume button using the P key
-applied new penalty in bonus class, it makes the break wrap around the screen added to loadSave
-------
-created separate branch called addSound
-added sound effects
+### **5. Build and Run the Program:**
+-   In IntelliJ, navigate to the "Run" tab (Run > Run).
+-   Choose the "Main" class file as the configuration.
+-   Click the "Run" button (green arrow icon) or press Shift + F10.
+
+### **6. Troubleshooting:**
+-   Verify that all dependencies, particularly the `javafx` library, are available
 
 
-## Simplification
-1. [Simplified] made direct assignment to identifier colideToBreakAndMoveToRight instead of indirect assignment
-2. [Simplified] used lambda expressions for anonymous methods
-3. [Simplified] added load and save function to loadsave class
-4. [Simplified] by using different coloured brick images, unnecessary lines of code was removed from the Block class
-5.
+## Implemented and Working Properly:
+List the features that have been successfully implemented and are functioning as expected. Provide a brief description of each.
+### Block breakability
+Each blocks breakability is dependent on the speed of the ball and the number of times it is hit to a maximum of 3 upon which it will be destroye. After every single hit, the image of the block will change to a random image. BLOCK_NORMAL are initialised to concrete blocks where as the BLOCK_STAR, BLOCK_HEART and BLOCK_CHOCO are initialised to red blocks.
+### Break Paddle Teleportation
+There is a new bonus called teleport which upon activation will allow the break paddle to wrap around the screen when reaching the left or right walls. For example, if the break paddle is moved to the utmost left and xBreak = 0, if the player presses LEFT again, the break paddle will be teleported and emerge from the right wall and vice-versa.
+### Highscore
+Using simple file handling, I record the highest score in a text file stored relative to the path of the project directory. When the player plays the game, after they *win* a game, their current score will be compared with the highscore and appropriate output will be displayed and the updates will be made to the file if highscore is bet. When the player then proceeds to the next level, the current score is not re-initialised to 0. It will remain the same and the next levels score will be added to it. Hence, after every level the players score will keep increasing until the end of the game (after 7 levels). If the player loses in a level, the score is erased and the streak is lost, but if they win a level, the streak continues and checks are made to see if the player bet the highscore. If the player beats the highscore at any level, they win the level. If the player beats the highscore by the end of all the levels, the player is the true winner of the game.
+### Heart Animation
+Added heart animation, where when the block of BLOCK_HEART is destroyed, the heart image will pop up, pulse 3 times and then move to the heart label of the game statistics menu.
+### Debris Animation
+Added block debris animation, where when each block is destroyed, the debris will pop up and change opacity and will disappear in the position of the block. This gives a realistic feel to the game when destroying the blocks.
+### Pause/Resume Game
+Implemented the pause and resume of the game which are both activated using the *P* key.
+### Exit Game
+The game can be exited *during* game play using *ESC* key. This is implemented by exiting the game engine and closing the window. Note, this only works when the game engine is running, it will not work when the main menu is displayed. This is not an issue since the window's close button can be used. One may argue that the game can be exited by just using the application window close button but it takes time to close the game engine. It is considerably quicker to close the engine and the window when closing the application while it is running.
+### Sound Effects
+This game has different sound effects for interactions between game play objects and for the game over and win menus. Different sounds are played when the ball hits the wall, when the ball hits the bottom wall, when ball hits a block, and when the game over menu is shown and when the you win menu is shown.
+### Window icon
+The logo image of the game Brick by Brick is placed as an icon for the window. This shows in the application window icon and in the taskbar.
+###  External font
+For all the labels and buttons in this game I have used an external font called VT323. I used this font because it suits the pixelated aesthetic of this game. There is no need to import any library to use this font because I have included the the font source in the resources directory.
+
+## Implemented but Not Working Properly:
+List any features that have been  
+implemented but are not working correctly. Explain the issues you encountered, and if possible, the steps you took to address them.
+
+I used VBox and HBox for the menus I have implemented called mainMenu, winMenu, gameOverMenu, betHighScoreMenu and also a game statistics menu called gamePlayStats. When initialising the buttons. particularly the back to menu, retry and next level buttons, they need to be setOnAction() to a function during runtime else the associated functions are not called. Because of setting them during run time, the only way it would work would be when I remove it from root Pane(), set the function and then add it to the root Pane again. This is very tedious but it is the only way I could make the buttons work. Because of this issue, some functions in the Main class are long.
 
 
-## Features
-[Implemented] added tutorial button to view instructions on how to play the game
-[Implemented] display background
-[Implemented] added external font for the game labels
-[Implemented] altered ball manipulations to hit at the surface not at the center
-[Implemented] game icon graphic added to the window bar
-[Implemented] window size alteration is disabled
-[Implemented] when isGoldStauts is true, gold background appears
-[NotImplementedYet] !!!ball initially at paddle center, press space bar to activate ball!!!
-[NotImplementedYet] !!!!when ball falls at bottom of screen, it returns to paddle center and space bar will activate it!!!!
-[NotImplementedYet] !!!!!highscore!!!!
-[Extended] main menu, and nextlevel or back to menu option is displayed after a level is complete (gameover or player wins)
-
-## Next steps
-1. fix load save function [DONE]
-2. highscore [DONE]
-3. fix the menu which does not show [DONE]
-4. DO PLAY HEART ANIMATION [DONE]
-4. fix the load game, nothing shows up [DONE]
-3. css design alignment of all the buttons [DONE]
-4. main game title in main menu [DONE]
-6. fix nullpointerexception error [!!!!!!!!!!!]
-7. fix concurrentexception error [DONE]
-8. 3 levels of brick breakability [DONE]
-9. fix the retry function it works for levels >1 and backtomenu also does not work for levels >1[DONE]
-11. paddle wrap around screen penalty [DONE]
-12. when no games were saved previously, display label animation for it [DONE]
-13. clean collision detection! [DONE]
-14. menupage and score can be singleton class
-15. check design patterns and implement it
-16. sound effects? [DONE]
-17. gold time progress bar?
-18. make DISPLAYVIEW singleton
-18. delet unecessary files from github [DONE]
-19. tutorial page
-21. restart game and new game have similar implementations can simplify it [DONE]
-22. make MVC!
-22. pause and exit button [DONE]
-24. wrap all ui components in platform.runlater() for removing the nullpointer exception if this does not work its ok just mention in readme
-
-
-
-
-
-
-
-
-## Implemented but Not Working Properly: 
-List any features that have been
-implemented but are not working correctly. Explain the issues you encountered,
-and if possible, the steps you took to address them.
-## Features Not Implemented: 
-Identify any features that you were unable to
+## Features Not Implemented
+Identify any features that you were unable to  
 implement and provide a clear explanation for why they were left out.
-## New Java Classes: 
-Enumerate any new Java classes that you introduced for the
-assignment. Include a brief description of each class's purpose and its location in the
+
+While exploring various features for my game, I considered including additional bonuses like a long paddle, a gun, and potential power-ups. However, upon careful consideration, I decided not to implement these features as they would significantly impact the game's difficulty and strategic depth. Implementing features like a long paddle or a gun could significantly simplify the gameplay, making it too easy for players to score and progress.
+Instead of implementing features that would simplify the game, I opted for a unique penalty called "teleportation." This feature adds a layer of unexpectedness and challenge, requiring players to adjust their strategies and adapt to the sudden changes in the ball's position. This approach maintains a balance between difficulty and enjoyment, promoting replayability and encouraging players to develop new skills.
+
+## New Java Classes
+Enumerate any new Java classes that you introduced for the  
+assignment. Include a brief description of each class's purpose and its location in the  
 code.
-## Modified Java Classes: 
-List the Java classes you modified from the provided code
-base. Describe the changes you made and explain why these modifications were
+
+
+## Modified Java Classes
+List the Java classes you modified from the provided code  
+base. Describe the changes you made and explain why these modifications were  
 necessary.
-## Unexpected Problems: 
-There will always be the NullPointerException that comes unexpectedly and the game freezes. This issue was detected early on, but it was impossible to solve.
-Though, from my knowledge, I assume that it is due to the root Pane(), when it unexpectedly becomes null during gameplay.
-Another issue was when the ball would freeze on screen, but it would be moving in the background and break the blocks. This can be shown by the scores increasing and the hearts decreasing in the game statistics. This may just be an issue with my computer.
-It took a while to figure out whether to dispose the mediaPlayer or to restart it, because the sound effects would get garbled and the sound would not stop. This was fixed by creating and initialising the media player in a separate function before playing it. 
-When going to the next level, or when a game needs to be retried, or when the player wishes to go back to menu,even if the buttons had been set to an action in the start method, the buttons never called the assigned methods.I had to set the functions of the buttons at every state game where the buttons were to be visible for them to work otherwise the buttons never function.
-Sometimes, the labels that are displayed are frozen on screen, this is not an error. It is just the computer processing problem. This is usually a problem that occurs at the beginning of the game when you first start playing it. This lagging is mainly due to the animation and sound effects applied to the game.
 
 
-Communicate any unexpected challenges or issues you
-encountered during the assignment. Describe how you addressed or attempted to
-resolve them.
+## Unexpected Problems
+Communicate any unexpected challenges or issues you  
+encountered during the assignment. Describe how you addressed or attempted to resolve them.
 
-
+There will always be the NullPointerException that comes unexpectedly and the game freezes. This issue was detected early on, but it was impossible to solve. Though, from my knowledge, I assume that it is due to the root Pane(), when it unexpectedly becomes null during gameplay.  
+Another issue was when the ball would freeze on screen, but it would move in the background and break the blocks. This can be verified by the scores increasing and the hearts decreasing in the game statistics. It is important to note that this may be an issue on the computer I tested on.
+It took a while to figure out whether to dispose the mediaPlayer or to restart it, because the sound effects would get garbled and the sound would not stop. This was fixed by creating and initialising the media player in a separate function before playing it.   
+When going to the next level, or when a game needs to be retried, or when the player wishes to go back to menu,even if the buttons had been set to an action in the start method, the buttons never called the assigned methods.I had to set the functions of the buttons at every state game where the buttons were to be visible for them to work otherwise the buttons never function.  
+Initially, some labels that are displayed are frozen on screen. This is usually a problem that occurs at the beginning of the game when you first start playing it. This lagging is mainly due to the animation and sound effects applied to the game.
 
 
 ## Refactoring
+### Exceptions:
+- UnsupportedThreadException: Occurred in the stop() function in the
+  GameEngine class. Solved by using the interrupt() function instead of
+  stop() for all three different threads (physicsThread, updateThread,
+  and timeThread).
+- InterruptedException: Occurred in all the overridden run() functions of the GameEngine class. Fixed by placing return statements in the catch blocks.
+- NullPointerException: Occurred when saving the state of the game. Fixed by using the assert statement to prevent the null pointer from the outputStream.flush() function in the saveGame() method of the LoadSave class.
+- IOException: when there are no existing saved games, handled this exception by outputting a relevent message and remaining control in main menu.
 
+### Simple Refactoring:
+- Altered meaningless identifier names to meaningful ones.
+- The save directory was changed to the relative path of the project directory.
+- Renamed the initialise method in the GameEngine with camel case following Bob's coding conventions.
+- Renamed meaningless identifiers to gameOverLabel and winLabel.
+- Made direct assignment to goRightBall and goDownBall in setPhysicsToBall in the Main class.
+- Renamed restartGame function to gameReset as it can be confused as retry game. This function reloads the whole game.
+- Used ternary operator for conditionaly statements to improve code readability.
 
+### UI Improvements:
+- Placed the animation and display sections of the code into Platform.runLater() for better UI control.
+- Used text wrap for the layout of the game statistics to prevent shifting out of frame when the stats increase in digits.
+-  Adjusted the time assigned for the label animation because they would freeze on screen during gameplay.
+- Made the window to be of fixed size with height sceneHeigt and sceneWidth. This window cannot be resized.
+
+### Game Statistics and Objects:
+- Ball is initialised to start from the break paddle and always start movement upwards not downwards. This is because, in accordance to the previous logic, the ball would start at random positions and move downwards, so, if there was a case where the random position was the bottom wall, the player would lose a life unnecessarily.
+- Set the Score class's score attribute to private and added getter and setter methods.
+- Moved initBoard from Main class to Block class and made it static.
+- Improved the collision detection for block and break paddle with the ball by considering the ball's radius.
+- Improved ball movement by setting vX and vY to fixed values in setPhysicsToBall instead of relying on relations logic with the break and ball positions, and the current level.
+- Removed unused variable oldXBreak.
+- Stopped the game after each level, displaying either winMenu, gameOverMenu or betHighScoreMenu.
+- Upon retrying a level, the heart and score atttributes are reinitialised; on proceeding to the next level, they remain unchanged; on going back to menu, the statistics are re-initialised.

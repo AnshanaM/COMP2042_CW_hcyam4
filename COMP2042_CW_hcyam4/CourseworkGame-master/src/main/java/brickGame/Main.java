@@ -88,7 +88,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         primaryStage.getIcons().add(icon);
         Platform.runLater(() -> {
             primaryStage.show();
-            //displayView.displayPortals();
             root.getChildren().addAll(background,bgGold, rect, ball, displayView.mainMenu, displayView.gamePlayStats, displayView.gameOverMenu, displayView.winMenu);
             for (Block block : blocks) {
                 root.getChildren().add(block.rect);
@@ -181,9 +180,20 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 gameEngine.setOnAction(Main.this);
                 gameEngine.setFps(150);
                 gameEngine.start();
-
                 displayView.mainMenu.setVisible(false);
                 displayView.gamePlayStats.setVisible(true);
+
+            });
+
+            displayView.tutorial.setOnAction(event -> {
+                root.getChildren().add(displayView.tutorialPage);
+                displayView.tutorialPage.setVisible(true);
+                root.getChildren().remove(displayView.backToMenu);
+                displayView.backToMenu.setLayoutX(310);
+                displayView.backToMenu.setLayoutY(30);
+                root.getChildren().add(displayView.backToMenu);
+                displayView.backToMenu.setVisible(true);
+                displayView.backToMenu.setOnAction(menuEvent -> gameReset(0));
 
             });
         } else {
