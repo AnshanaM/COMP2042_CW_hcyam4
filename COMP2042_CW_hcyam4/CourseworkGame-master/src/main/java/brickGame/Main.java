@@ -96,7 +96,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         });
     }
-
     private boolean checkLoad(){
         if (loadSave.loadGame()){
             loadFromSave = true;
@@ -162,15 +161,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         } else {
             loadFromSave = false;
             gameController.startGameEngine(this);
-
         }
     }
-
     @Override
     public void handle(KeyEvent event) {
         gameController.handle(event);
     }
-
     protected static void wrapPaddle(boolean toRight) {
         if (teleport) {
             displayView.showMessage("TELEPORT");
@@ -182,7 +178,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             //centerBreakX = xBreak + halfBreakWidth;
         }
     }
-
     protected static void resetColideFlags() {
         colideToBreak = false;
         colideToBreakAndMoveToRight = false;
@@ -300,7 +295,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         });
     }
-
     private void updateBallDirection(int hitCode){
         if (hitCode == Block.HIT_RIGHT) {
             goRightBall = false;
@@ -357,7 +351,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public void onInit() {
         //no implementation needed here
     }
-
     @Override
     public void onPhysicsUpdate() {
         if (!isPaused){
