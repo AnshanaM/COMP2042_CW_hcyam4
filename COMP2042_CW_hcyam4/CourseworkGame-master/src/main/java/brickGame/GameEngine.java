@@ -1,63 +1,70 @@
 package brickGame;
 
-
 import java.io.IOException;
 
 public class GameEngine {
-
+    private static GameEngine instance;
     private OnAction onAction;
-    private int fps = 15;
+    private int fps;
     private Thread updateThread;
     private Thread physicsThread;
-    public boolean isStopped = true;
+    private boolean isStopped;
+    private long time = 0;
+    private Thread timeThread;
+
+    private GameEngine() {
+        fps = 15;
+        isStopped = true;
+    }
+
+    public static GameEngine getInstance() {
+        if (instance == null) {
+            instance = new GameEngine();
+        }
+        return instance;
+    }
 
     public void setOnAction(OnAction onAction) {
         this.onAction = onAction;
     }
 
     /**
-     * @param fps set fps and we convert it to millisecond
+     * Set fps and convert it to milliseconds.
+     *
+     * @param fps Frames per second
      */
     public void setFps(int fps) {
         this.fps = (int) 1000 / fps;
     }
 
-    private synchronized void Update() {
-        updateThread = new Thread(new Runnable() {
-            @Override
-            public synchronized void run() {
-                while (!updateThread.isInterrupted()) {
-                    try {
-                        onAction.onUpdate();
-                        Thread.sleep(fps);
-                    } catch (InterruptedException e) {
-                        return;
-                        //e.printStackTrace();
-                    }
+    private synchronized void update() {
+        updateThread = new Thread(() -> {
+            while (!updateThread.isInterrupted()) {
+                try {
+                    onAction.onUpdate();
+                    Thread.sleep(fps);
+                } catch (InterruptedException e) {
+                    return;
+                    // e.printStackTrace();
                 }
             }
         });
         updateThread.start();
     }
 
-    private void Initialize() {
+    private void initialize() {
         onAction.onInit();
     }
 
-    private synchronized void PhysicsCalculation() {
-        physicsThread = new Thread(new Runnable() {
-            @Override
-            public synchronized void run() {
-                while (!physicsThread.isInterrupted()) {
-                    try {
-                        onAction.onPhysicsUpdate();
-                        Thread.sleep(fps);
-                    } catch (InterruptedException e) {
-                        return;
-                        //e.printStackTrace();
-                    } catch (IOException e) {
-                        return;
-                    }
+    private synchronized void physicsCalculation() {
+        physicsThread = new Thread(() -> {
+            while (!physicsThread.isInterrupted()) {
+                try {
+                    onAction.onPhysicsUpdate();
+                    Thread.sleep(fps);
+                } catch (InterruptedException | IOException e) {
+                    return;
+                    // e.printStackTrace();
                 }
             }
         });
@@ -66,45 +73,37 @@ public class GameEngine {
 
     public void start() {
         time = 0;
-        Initialize();
-        Update();
-        PhysicsCalculation();
-        TimeStart();
+        initialize();
+        update();
+        physicsCalculation();
+        timeStart();
         isStopped = false;
     }
 
     public void stop() {
         if (!isStopped) {
             isStopped = true;
-            updateThread.interrupt();//changed from updateThread.stop()
-            physicsThread.interrupt();//same for this
-            timeThread.interrupt();//same for this too
+            updateThread.interrupt(); // changed from updateThread.stop()
+            physicsThread.interrupt(); // same for this
+            timeThread.interrupt(); // same for this too
         }
     }
 
-    private long time = 0;
-
-    private Thread timeThread;
-
-    private void TimeStart() {
-        timeThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        time++;
-                        onAction.onTime(time);
-                        Thread.sleep(1);
-                    }
-                } catch (InterruptedException e) {
-                    return;
-                    //e.printStackTrace();
+    private void timeStart() {
+        timeThread = new Thread(() -> {
+            try {
+                while (true) {
+                    time++;
+                    onAction.onTime(time);
+                    Thread.sleep(1);
                 }
+            } catch (InterruptedException e) {
+                return;
+                // e.printStackTrace();
             }
         });
         timeThread.start();
     }
-
 
     public interface OnAction {
         void onUpdate();
@@ -115,5 +114,4 @@ public class GameEngine {
 
         void onTime(long time);
     }
-
 }

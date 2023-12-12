@@ -14,13 +14,21 @@ import javafx.scene.media.MediaPlayer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SpecialEffects {
-    static ImageView debrisImage;
-//    private void setSound(String fileName){
-//        String soundFile = Main.class.getResource("/ball_paddle.wav").toString();
-//        MediaPlayer mediaPlayer = new MediaPlayer(new Media(soundFile));
-//    }
+    private static SpecialEffects instance;
+    private static ImageView debrisImage;
+    private static ImageView heartImage;
 
-    public static ImageView heartImage = new ImageView("heartImage.jpg");
+    private SpecialEffects() {
+        heartImage = new ImageView("heartImage.jpg");
+    }
+
+    public static SpecialEffects getInstance() {
+        if (instance == null) {
+            instance = new SpecialEffects();
+        }
+        return instance;
+    }
+
     public static void playLabelAnimation(Label labelToAnimate, Pane root) {
         labelToAnimate.setVisible(true);
         labelToAnimate.setScaleX(0);
@@ -36,15 +44,16 @@ public class SpecialEffects {
         timeline.play();
     }
 
-    public static void initObj(ImageView img, double x, double y,int height, int width){
+    public static void initObj(ImageView img, double x, double y, int height, int width) {
         img.setVisible(false);
         img.setX(x);
         img.setY(y);
         img.setFitWidth(width);
         img.setFitHeight(height);
         img.setOpacity(1.0);
-        addImageView(img,Main.root);
+        addImageView(img, Main.root);
     }
+
     public static void playHeartAnimation(double x, double y) {
         initObj(heartImage, x, y, 35, 35);
         heartImage.setVisible(true);
@@ -68,11 +77,12 @@ public class SpecialEffects {
         sequentialTransition.setOnFinished(event -> removeImageView(heartImage, Main.root));
         sequentialTransition.play();
     }
-        private static Timeline debrisTimeline;
+
+    private static Timeline debrisTimeline;
 
     public static void playBlockDebris(int x, int y, Pane root) {
         debrisImage = new ImageView("debris.png");
-        initObj(debrisImage, x, y, 54, 67);
+        initObj(debrisImage, x, y, 64, 87);
         debrisImage.setVisible(true);
         debrisImage.setScaleX(0);
         debrisImage.setScaleY(0);
@@ -104,17 +114,19 @@ public class SpecialEffects {
         debrisTimeline.play();
     }
 
-
     private static void removeImageView(ImageView imageView, Pane root) {
         root.getChildren().remove(imageView);
     }
+
     private static void removeLabel(Label animatedLabel, Pane root) {
         root.getChildren().remove(animatedLabel);
     }
-    public static void addImageView(final ImageView img, Pane root){
+
+    public static void addImageView(final ImageView img, Pane root) {
         root.getChildren().add(img);
     }
-    private static MediaPlayer setMediaPlayer(String sound){
+
+    private static MediaPlayer setMediaPlayer(String sound) {
         String soundFile = Main.class.getResource(sound).toString();
         return new MediaPlayer(new Media(soundFile));
     }
@@ -124,7 +136,4 @@ public class SpecialEffects {
         mPlayer.play();
         mPlayer.setOnEndOfMedia(() -> mPlayer.dispose());
     }
-
-
-
 }

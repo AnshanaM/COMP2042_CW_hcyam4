@@ -154,6 +154,7 @@ public class Block implements Serializable {
             System.out.println("gold ball");
             Main.displayView.setGold();
             Main.isGoldStauts = true;
+            Main.displayView.showMessage("GOLD START");
             System.out.println("\ngold bonus");
         }
         if (this.type == Block.BLOCK_HEART) {

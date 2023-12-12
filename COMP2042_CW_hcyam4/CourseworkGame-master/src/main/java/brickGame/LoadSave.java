@@ -3,14 +3,22 @@ package brickGame;
 import java.io.*;
 import java.util.ArrayList;
 
-import static brickGame.Main.score;
-import static brickGame.Main.yBreak;
 
 public class LoadSave {
+    private static LoadSave instance;
     private static String savePath    = "./save/save.mdds";
     private static String savePathDir = "./save";
 
     public ArrayList<BlockSerializable> blocks = new ArrayList<>();
+    private LoadSave(){
+        //no initilaising required in this class
+    }
+    public static LoadSave getInstance() {
+        if (instance == null) {
+            instance = new LoadSave();
+        }
+        return instance;
+    }
 
     public boolean loadGame() {
         try {
@@ -24,7 +32,7 @@ public class LoadSave {
             Main.xBall = inputStream.readDouble();
             Main.yBall = inputStream.readDouble();
             Main.xBreak = inputStream.readDouble();
-            yBreak = inputStream.readDouble();
+            Main.yBreak = inputStream.readDouble();
             Main.centerBreakX = inputStream.readDouble();
             Main.time = inputStream.readLong();
             Main.goldTime = inputStream.readLong();
@@ -46,18 +54,18 @@ public class LoadSave {
                 Main.destroyedBlockCount = 0;
                 blocks = (ArrayList<BlockSerializable>) inputStream.readObject();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("\nCannot load from file");
             }
-            Main.swap = inputStream.readBoolean();
+            Main.teleport = inputStream.readBoolean();
+            Main.displayView.showMessage("Game Loaded");
         } catch (IOException e) {
-            System.out.println("no games saved previously");
+            System.out.println("No games saved previously");
             return false;
-            //e.printStackTrace();
         }
         return true;
     }
 
-    public void saveGame(Main main, ArrayList<BlockSerializable> blockSerializables) {
+    public void saveGame(ArrayList<BlockSerializable> blockSerializables) {
         new Thread(() -> {
             new File(savePathDir).mkdirs();
             File file = new File(savePath);
@@ -95,13 +103,11 @@ public class LoadSave {
                 outputStream.writeBoolean(Main.colideToTopBlock);
 
                 outputStream.writeObject(blockSerializables);
-                outputStream.writeBoolean(Main.swap);
-                score.showMessage("Game Saved", main);
+                outputStream.writeBoolean(Main.teleport);
+                Main.displayView.showMessage("Game Saved");
 
             } catch (IOException e) {
-                System.out.print("File IO access issue");
-                return;
-                //e.printStackTrace();
+                System.out.print("Cannot write to File");
             } finally {
                 try {
                     assert outputStream != null;
@@ -109,7 +115,6 @@ public class LoadSave {
                     outputStream.close();
                 } catch (IOException e) {
                     System.out.print("File IO access issue");
-                    //e.printStackTrace();
                 }
             }
         }).start();

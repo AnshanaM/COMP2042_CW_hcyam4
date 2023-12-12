@@ -1,4 +1,5 @@
 package brickGame;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -10,15 +11,16 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
-import static brickGame.Main.portals;
 
 public class DisplayView {
+    private static DisplayView instance;
     public static VBox mainMenu,gameOverMenu,winMenu,betHighScoreMenu;
     public static HBox gamePlayStats;
     public static Label scoreLabel, heartLabel, levelLabel, title, youWin, gameOver,highScoreLabel,commentLabel;
     public static Button load, newGame, tutorial, backToMenu, nextLevel, retry;
+    public static ImageView tutorialPage = new ImageView(new Image("tutorial.png",Main.sceneWidth , Main.sceneHeight, false, true));
 
-    public DisplayView(){
+    private DisplayView(){
         mainMenuInit();
         gamePlayScreenInit();
         gameOverMenuInit();
@@ -32,7 +34,18 @@ public class DisplayView {
         Main.primaryStage.setScene(Main.scene);
         initBall();
         initBreak();
+        Main.root.getChildren().add(tutorialPage);
+        tutorialPage.setVisible(false);
+        //displayPortals();
     }
+
+    public static DisplayView getInstance(){
+        if (instance == null) {
+            instance = new DisplayView();
+        }
+        return instance;
+    }
+
     private void setFont(){
         try {
             Font font = Font.loadFont(getClass().getResourceAsStream("/VT323.ttf"), 15);
@@ -82,10 +95,10 @@ public class DisplayView {
     }
 
     private void gamePlayScreenInit() {
-        scoreLabel = new Label("Score: " + Main.score.getScore());
+        scoreLabel = new Label("Score: " + Score.getScore());
         levelLabel = new Label("Level: " + Main.level);
         heartLabel = new Label("Heart: " + Main.heart);
-        highScoreLabel = new Label("Highscore: " + Main.score.getHighScore());
+        highScoreLabel = new Label("Highscore: " +Score.getHighScore());
         //max width for each label
         scoreLabel.setMaxWidth(75);
         heartLabel.setMaxWidth(75);
@@ -112,7 +125,6 @@ public class DisplayView {
         gamePlayStats.setVisible(true);
     }
     private void initBgGold(){
-        //setting goldtime background
         Main.bgGold = new Rectangle();
         Main.bgGold.setWidth(Main.sceneWidth);
         Main.bgGold.setHeight(Main.sceneHeight);
@@ -121,13 +133,6 @@ public class DisplayView {
         ImagePattern pattern = new ImagePattern(new Image("bgGold.jpg"));
         Main.bgGold.setFill(pattern);
         Main.bgGold.setVisible(false);
-    }
-    public void noSaves(){
-        Label noSaves = new Label("NO GAMES SAVED");
-        noSaves.setLayoutX(((double) Main.sceneWidth / 2) - (noSaves.getWidth()));
-        noSaves.setLayoutY((double) Main.sceneHeight / 2 - (noSaves.getHeight()));
-        Main.root.getChildren().add(noSaves);
-        SpecialEffects.playLabelAnimation(noSaves, Main.root);
     }
     public void removeGold(){
         Main.bgGold.setVisible(false);
@@ -140,8 +145,8 @@ public class DisplayView {
         Main.bgGold.setVisible(true);
     }
     private void initBall() {
-        Main.xBall = Main.xBreak + Main.breakWidth/2;
-        Main.yBall = Main.yBreak + Main.breakHeight/4;
+        Main.xBall = Main.xBreak + Main.centerBreakX;
+        Main.yBall = Main.yBreak + Main.breakHeight;
         Main.ball = new Circle();
         Main.ball.setRadius(Main.ballRadius);
         Main.ball.setFill(new ImagePattern(new Image("ball.png")));
@@ -172,15 +177,22 @@ public class DisplayView {
         Main.root.getChildren().add(betHighScoreMenu);
     }
 
-    public static void displayPortals(){
-        portals = new Rectangle();
-        portals.setWidth(Main.sceneWidth);
-        portals.setHeight(Main.sceneHeight);
-        portals.setX(0);
-        portals.setY(0);
-        ImagePattern pattern = new ImagePattern(new Image("portals.png"));
-        portals.setFill(pattern);
-        Main.root.getChildren().add(portals);
-        Main.portals.setVisible(true);
+    private static void addLabel(final Label labelToAdd) {
+        Platform.runLater(() -> Main.root.getChildren().add(labelToAdd));
+    }
+    public static void showMessage(String msg) {
+        final Label message = new Label(msg);
+        message.setTranslateX(220);
+        message.setTranslateY(340);
+        addLabel(message);
+        SpecialEffects.playLabelAnimation(message,Main.root);
+    }
+    public static void show(final double x, final double y, int score) {
+        String sign = (score >= 0) ? "+" : "";
+        final Label scoreIncrement = new Label(sign + score);
+        scoreIncrement.setTranslateX(x);
+        scoreIncrement.setTranslateY(y);
+        addLabel(scoreIncrement);
+        Main.specialEffects.playLabelAnimation(scoreIncrement, Main.root);
     }
 }

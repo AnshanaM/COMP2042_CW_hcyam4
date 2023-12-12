@@ -39,7 +39,7 @@ public class Bonus implements Serializable {
             type = 1;
         }
         else{
-            url = "penalty.png";
+            url = "teleport.png";
             type = 2;
         }
         bonus.setFill(new ImagePattern(new Image(url)));
@@ -55,20 +55,20 @@ public class Bonus implements Serializable {
                 this.taken = true;
                 this.bonus.setVisible(false);
                 Main.score.incScore(3);
-                Main.score.show(this.x, this.y, 3);
+                Main.displayView.show(this.x, this.y, 3);
             }
             else if (type == 1){
                 System.out.println("You Got it and +5 score for you");
                 this.taken = true;
                 this.bonus.setVisible(false);
                 Main.score.incScore(5);
-                Main.score.show(this.x, this.y, 5);
+                Main.displayView.show(this.x, this.y, 5);
             }
             else{
                 this.taken = true;
                 this.bonus.setVisible(false);
-                Main.swap = true;
-                Platform.runLater(() -> Main.displayView.displayPortals());
+                Main.teleport = true;
+                Main.displayView.showMessage("TELEPORT");
 
             }
 
